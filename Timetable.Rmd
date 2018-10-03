@@ -3,8 +3,8 @@ title: 'Intro to Frequentist and Bayesian mixed models course'
 author: "Andrew Parnell"
 date: "October 2018"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 urlcolor: blue
 ---
 
