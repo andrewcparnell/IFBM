@@ -1,9 +1,9 @@
 ---
-title: 'Class 1: An introduction to Bayesian Hierarchical Modelling'
-author: Andrew Parnell \newline \texttt{andrew.parnell@ucd.ie}   \newline \vspace{1cm}
-  \newline \includegraphics[width=1cm]{UCDlogo.pdf}
+title: 'Class 1: Introduction to Frequentist and Bayesian Mixed/Hierarchical Modelling'
+author: Andrew Parnell \newline \texttt{andrew.parnell@mu.ie}   \newline \vspace{1cm}
+  \newline \includegraphics[width=5cm]{MU_logo.jpg}
   \newline \vspace{2cm}
-  https://goo.gl/6LpnWY
+  https://goo.gl/fCH4cU
 output:
   beamer_presentation:
     includes:
@@ -19,7 +19,7 @@ par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
 
 - Tell me who you are, what you are working on, and what you hope to get out of the week
 - Timetable for the week
-- Pre-requisites
+- Prerequisites
 
 ## How this course works
 
@@ -27,26 +27,27 @@ par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
 - The timetable html document provides links to all the pdf slides and practicals
 - The slides and the practicals are all written in `Rmarkdown` format, which means you can load them up in Rstudio and see how everything was created
 - Let me know if you spot mistakes, as these can be easily updated on the GitHub page
-- There is a `bhm_course.Rproj` R project file from which you should be able to run all the code
+- There is a `IFBM.Rproj` R project file from which you should be able to run all the code
 
 ## Course format and other details
 
 - Lectures will take place in the morning, practical classes in the afternoon
-- We will finish earlier on Wednesday/Thursday for a mini-trip
+- Timetable very flexible
 - Please ask lots of questions
 - Some good books:
 
+    - _lme4: Mixed-effects modeling with R_ by Bates
     - _Data Analysis using Regression and Hierarchical Models_ by Gelman and Hill
     - _Bayesian Data Analysis_ by Gelman et al
 
-
-## What is a Bayesian hierarchical model?
+## What is a mixed model?
 
 - __A model__ is just a representation/approximation of the real world, here expressed in equations
-- __Hierarchical__ means that the model is built up in _ordered layers_ which makes it easier to fit very complex models
-- __Bayesian__ means the model involves both a _likelihood_ and a _prior_ probability distribution (more on this tomorrow)
+- __Mixed__ means that the model is built up of _fixed_ and _random_ effects 
+- __Fixed effects__ do not vary between groups, 
+- __Random effects__ vary between groups such that their variation is controlled and can be removed
 
-## Thinking hierarchically: example 1
+## Thinking about mixed models: example 1
 
 ```{r, echo = FALSE}
 # Feed conversion rate example
@@ -127,8 +128,8 @@ head(swt)
 
 ## Summary
 
-- In hierarchical models we avoid fitting models separately as much as possible
+- In mixed models we try to avoid fitting models to separate parts of the data as much as possible
 
 - By fitting models together we __borrow strength__ from the different groups in the data and reduce uncertainty
 
-- Bayesian models allow us to incorporate all the available data into providing information on the question we want to answer
+- (Later in the week) Bayesian models allow us to incorporate all the available information to answer the key question(s) of interest

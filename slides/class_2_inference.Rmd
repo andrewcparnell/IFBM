@@ -1,7 +1,7 @@
 ---
 title: 'Class 2: Likelihood and Inference'
 author: Andrew Parnell\newline \texttt{andrew.parnell@ucd.ie} \newline \vspace{1cm}
-  \newline \includegraphics[width=1cm]{UCDlogo.pdf}
+  \newline \includegraphics[width=5cm]{MU_logo.jpg}
 output:
   beamer_presentation:
     includes:
@@ -12,8 +12,8 @@ output:
 knitr::opts_chunk$set(dev = 'pdf')
 options(width = 40)
 par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
-pkgs = c('R2jags','rjags', 'lubridate', 'tidyverse','forecast', 'rstan')
-lapply(pkgs, library, character.only = TRUE)
+# pkgs = c('R2jags','rjags', 'lubridate', 'tidyverse','forecast', 'rstan')
+# lapply(pkgs, library, character.only = TRUE)
 ```
 
 ## Learning outcomes
@@ -208,14 +208,14 @@ qqline(x)
 - Having the 'best' values of the parameters isn't the whole story
 - We only have a limited set of data so we can't possibly know the true values exactly. We need to have estimates of uncertainty about the parameters
 - With only a small set of data, the parameter uncertainty should be large
-- With a larger data set, we should be able to get closer to the true values
+- With a larger data set, we should be able to get closer to the `true' values
 
 ## Calculating the uncertainty in the parameters
 
 - There is some mathematical theory which says that the estimated parameters are normally distributed themselves
 - The standard deviation of the estimated parameters depends on the second derivative of the likelihood. Again, we will leave this to the experts
 - R can calculate for us the standard deviation estimates of the parameters
-- This means that we can an estimated standard deviation of an estimated standard deviation!
+- This means that we can get an estimated standard deviation of an estimated standard deviation!
 - The estimated standard deviation is usually called the _standard error_
 
 ## Quantiles of probability distributions
@@ -234,11 +234,11 @@ qnorm(0.9)
 - These are based on testing a null hypothesis that a particular parameter value is (usually) 0
 - (Can anyone remember the proper definition of a $p$-value?)
 - I don't find these very useful but we will see them in lots of the default R output
-- None of the package we will use in this course (e.g. JAGS and Stan) create $p$-values
+- The `lme4` package creates these everywhere, but the later packages (`rstan` and `rstanarm`) do not use them
 
 ## Summary 
 
 - Choosing a probability distribution is hard. For the data sets we use I will try to give you lots of choices
 - Once you have a chosen model you can compute a likelihood
 - You can use an optimisation method to get you the best parameter values
-- Later in the course we will meet a method (called MCMC) which finds the best values, also gets the uncertainty, and doesn't require the assumption of parameter normality
+- Later in the course we will meet a method (called HMC) which finds the best values, also gets the uncertainty, and doesn't require the assumption of parameter normality

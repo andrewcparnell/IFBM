@@ -11,9 +11,8 @@ rm(list=ls()) # Clear the workspace
 knitr::opts_chunk$set(echo = TRUE)
 par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01, las=1)
 options(width = 50)
-pkgs = c('R2jags','rjags', 'lubridate', 'tidyverse','forecast', 'rstan')
-lapply(pkgs, library, character.only = TRUE)
-
+# pkgs = c('lubridate', 'tidyverse','forecast', 'rstan')
+# lapply(pkgs, library, character.only = TRUE)
 ```
 
 ## Introduction
