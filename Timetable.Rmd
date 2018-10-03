@@ -1,0 +1,77 @@
+---
+title: 'Intro to Frequentist and Bayesian mixed models course'
+author: "Andrew Parnell"
+date: "October 2018"
+output:
+  pdf_document: default
+  html_document: default
+urlcolor: blue
+---
+
+Module pre-requisites can be found [here](https://rawgit.com/andrewcparnell/IFBM/master/Prerequisites.html). All the raw files and code can be found [here](https://github.com/andrewcparnell/IFBM). Click 'Download ZIP' near the top right if you want an offline version of the material
+
+## Monday 8th October
+
+Time  | Class
+------------- | ----------------------------------------------------
+9:00-10:00 | Introduction, example data sets [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_1_intro.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_1_intro_handout.pdf)
+10:00-10:15 | Coffee break
+10:15-11:15 | Revision: likelihood and inference [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_2_inference.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_2_inference_handout.pdf)
+11:15-11:30 | Break 
+11:30-12:30 | Revision: linear regression and GLMs [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_3_glms.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_3_glms_handout.pdf)
+12:30-13:30 | Lunch
+13:30-14:30 | Loading data in R and running simple analysis [(code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/tutor_1_R_basics.R)
+14:30-15:00 | Coffee break
+15:00-17:00 | Self-guided practical: Using R for linear regression and GLMs' [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf) [(answer code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_answers.R)
+
+## Tuesday 9th October
+
+9:00-10:00 | Introduction to mixed models [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_1_intro.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_1_intro_handout.pdf)
+10:00-10:15 | Coffee break
+10:15-11:15 | Linear Mixed Models
+[(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_2_inference.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_2_inference_handout.pdf)
+11:15-11:30 | Break 
+11:30-12:30 | Generalised Linear Mixed Models [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_3_glms.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_3_glms_handout.pdf)
+12:30-13:30 | Lunch
+13:30-14:30 | Running Mixed Models in lme4 [(code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/tutor_1_R_basics.R)
+14:30-15:00 | Coffee break
+15:00-17:00 | Self-guided practical: exercises in lme4 [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf) [(answer code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_answers.R)
+
+## Wednesday 10th October
+
+9:00-10:00 | Introduction to Bayesian statistics [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_1_intro.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_1_intro_handout.pdf)
+10:00-10:15 | Coffee break
+10:15-11:15 | Bayesian hierarchical linear and generalised linear models
+[(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_2_inference.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_2_inference_handout.pdf)
+11:15-11:30 | Break 
+11:30-12:30 | Multivariate and multi-layer hierarchical models [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_3_glms.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_3_glms_handout.pdf)
+12:30-13:30 | Lunch
+13:30-14:30 | Running hierarchical models in rstanarm [(code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/tutor_1_R_basics.R)
+14:30-15:00 | Coffee break
+15:00-17:00 | Self-guided practical: exercises in rstanarm [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf) [(answer code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_answers.R)
+
+## Thursday 11th October
+
+9:00-10:00 | Partial pooling, zero-inflation, and multinomial models [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_1_intro.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_1_intro_handout.pdf)
+10:00-10:15 | Coffee break
+10:15-11:15 | Variable selection and non-parametrics
+[(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_2_inference.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_2_inference_handout.pdf)
+11:15-11:30 | Break
+11:30-12:30 | Prior and posterior predictive inference
+[(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_3_glms.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_3_glms_handout.pdf)
+12:30-13:30 | Lunch
+13:30-14:30 | Creating your own models in stan [(code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/tutor_1_R_basics.R)
+14:30-15:00 | Coffee break
+15:00-17:00 | Self-guided practical: bring your own data  [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf) [(answer code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_answers.R)
+
+## Friday 12th October
+
+9:00-10:00 | Time series models and change-point analysis  [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_1_intro.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_1_intro_handout.pdf)
+10:00-10:15 | Coffee break
+10:15-11:15 | Comparing models in Stan using Loo and WAIC
+[(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_2_inference.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/day_1/class_2_inference_handout.pdf)
+11:15-11:30 | Break
+11:30-12:30 | Bring your own data session 1 
+12:30-13:30 | Lunch
+13:30-16:00 | Bring your own data session 2
+
