@@ -1,0 +1,53 @@
+---
+title: 'Class 4: Introduction to mixed models'
+author: Andrew Parnell\newline \texttt{andrew.parnell@ucd.ie} \newline \vspace{1cm}
+  \newline \includegraphics[width=5cm]{MU_logo.jpg}
+output:
+  beamer_presentation:
+    includes:
+      in_header: header.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(dev = 'pdf')
+options(width = 40)
+par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
+# setwd("~/GitHub/ecots/slides/day_1")
+# pkgs = c('R2jags','rjags', 'lubridate', 'tidyverse','forecast', 'rstan')
+# lapply(pkgs, library, character.only = TRUE)
+```
+
+## Learning outcomes
+
+- Know the difference between a simple linear regression and a simple mixed model
+- Be able to identify and understand the key features of a mixed model
+- Know how to fit a simple mixed model in `lme4`
+- Be able to interpret the output of a simple mixed model
+
+## What is a mixed effects model?
+
+
+## Why not fit everything with fixed effects?
+
+
+## Example data set
+
+
+## The mathematics of a simple linear mixed effects model
+
+
+## Fitting the model in lme4
+
+
+## Interpreting the output of the model
+
+
+## Extra output available
+
+
+## 
+
+
+
+## Summary 
+
