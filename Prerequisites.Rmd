@@ -6,19 +6,21 @@ output: html_document
 
 In preparation for the course please install the following, preferably in the below suggested order. Make sure you run these before you arrive in case of poor (or crowded!) internet.
 
-Remember you will need to bring your own personal computer for the duration of the course.
+Remember you will need to bring your own personal computer for the duration of the course. 
 
 ### Step 1
 
-Install the following using the corresponding links
+Install theses packages by following the links
 
--	R: [http://www.r-project.org](http://www.r-project.org)
+-	R: [www.r-project.org](http://www.r-project.org)
 
--	Rstudio (optional but recommended): [https://www.rstudio.com](https://www.rstudio.com)
+-	Rstudio (optional but recommended): [www.rstudio.com](https://www.rstudio.com)
 
--	JAGS: http://sourceforge.net/projects/mcmc-jags/files/
+-	JAGS: [sourceforge.net/projects/mcmc-jags/files/](http://sourceforge.net/projects/mcmc-jags/files/)
 
 - If you're using Windows you also need to install the correct version of [Rtools](https://cran.r-project.org/bin/windows/Rtools/) to match your R version
+
+If you have installed any of these previously please make sure you have the most up-to-date versions. 
 
 ### Step 2
 
