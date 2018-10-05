@@ -22,7 +22,7 @@ Time  | Class
 12:45-13:45 | Lunch
 13:45-15:00 | Loading data in R and running simple analysis [(code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/tutor_1_R_basics.R)
 15:00-15:30 | Coffee break
-15:30-17:00 | Self-guided practical: Using R for linear regression and GLMs' [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf)
+15:30-17:00 | Using R for linear regression and GLMs' [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf)
 
 ## Tuesday 9th October - Mixed models and lme4
 
@@ -36,7 +36,7 @@ Time  | Class
 12:45-13:45 | Lunch
 13:45-15:00 | Running Mixed Models in lme4 [(code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/tutor_1_R_basics.R)
 15:00-15:30 | Coffee break
-15:30-17:00 | Self-guided practical: exercises in lme4 [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf) [(answer code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_answers.R)
+15:30-17:00 | Exercises in lme4 [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf)
 
 ## Wednesday 10th October - Mixed models and rstanarm
 
@@ -50,7 +50,7 @@ Time  | Class
 12:45-13:45 | Lunch
 13:45-15:00 | Running hierarchical models in rstanarm [(code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/tutor_1_R_basics.R)
 15:00-15:30 | Coffee break
-15:30-17:00 | Self-guided practical: exercises in rstanarm [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf) [(answer code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_answers.R)
+15:30-17:00 | Exercises in rstanarm [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf)
 
 ## Thursday 11th October - Advanced mixed models with rstan
 
@@ -64,7 +64,7 @@ Time  | Class
 12:45-13:45 | Lunch
 13:45-15:00 | Creating your own models in rstan [(code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/tutor_1_R_basics.R)
 14:30-15:00 | Coffee break
-15:30-17:00 | Self-guided practical: running advanced models in rstan [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf) [(answer code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_answers.R)
+15:30-17:00 | Running advanced models in rstan [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf)
 
 ## Friday 12th October - Advanced topics and extensions
 

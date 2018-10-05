@@ -10,7 +10,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(dev = 'pdf')
-options(width = 40)
+#options(width = 40)
 par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
 # setwd("~/GitHub/ecots/slides/day_1")
 # pkgs = c('R2jags','rjags', 'lubridate', 'tidyverse','forecast', 'rstan')
@@ -26,28 +26,155 @@ par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
 
 ## What is a mixed effects model?
 
-
-## Why not fit everything with fixed effects?
+- You are probably used to seeing _fixed effects_ models:
+$$y_i = \alpha + \beta x_i + \epsilon_i$$
+- Here $\alpha$ and $\beta$ are fixed effects
+- That means they do not vary by group (or observation)
+- When we add in terms that vary by group or observation and give these a specified probability distribution then we have a _mixed effects_ model. You need a categorical covariate to do that. 
+- (In fact $\epsilon_i$ can be considered a _random effect_ because it varies by observation and has a constrained distribution $\epsilon_i \sim N(0, \sigma^2)$)
 
 
 ## Example data set
 
+\small
 
-## The mathematics of a simple linear mixed effects model
-
-
-## Fitting the model in lme4
-
-
-## Interpreting the output of the model
-
-
-## Extra output available
+- Let's think again about the earnings data where we want to estimate log(earnings) from people's height in cm using a linear regression model where height is mean centered, i.e.
+$$\log(\mbox{earnings}_i) = \alpha + \beta \times (\mbox{height}_i - \mbox{mean(height)}) + \epsilon_i$$
+```{r, fig.height=4}
+dat = read.csv('../data/earnings.csv')
+with(dat, plot(x_centered, y, xlab = 'Height (centered)',
+     ylab = 'log(Earnings)', pch = 19))
+```
 
 
-## 
 
+
+## Model fit
+
+\small
+```{r}
+summary(lm(y ~ x_centered, data = dat))
+```
+
+## Plot with fitted line
+
+```{r, fig.height = 6}
+with(dat, plot(x_centered, y, xlab = 'Height (centered)',
+     ylab = 'log(Earnings)', pch = 19))
+lines(dat$x_centered, lm(y ~ x_centered, 
+                         data = dat)$fitted.values)
+```
+
+
+## Using slightly more information
+
+```{r, fig.height = 5}
+eth_names = c('Blacks','Hispanics','Whites','Others')
+with(dat, plot(x_centered, y, xlab = 'Height (centered)',
+     ylab = 'log(Earnings)', type = 'n'))
+with(dat, points(jitter(x_centered, 2), y, col = eth, 
+                 pch = 19))
+legend('bottomright', eth_names, col = 1:4, pch = 19)
+```
+
+## A new model
+
+Suppose we wanted to fit a simple model where there was a different (parallel) fitted line for each ethnic group:
+$$y_{ij} = \alpha_j + \beta x_{ij} + \epsilon_{ij}$$
+
+- Note the change of notation. We now write $y_{ij}$ as the $i$th observation in group (ethnicity) $j$
+
+- There are 4 ethnicity groups so $j= 1, \ldots, 4$ but different numbers of observations in each group
+
+```{r}
+table(dat$eth)
+```
+
+## How could we fit this new model?
+
+I can think of three obvious ways:
+
+1. Divide the data up into 4 groups and fit each individually
+1. Fit a linear regression for all the data and include ethnicity as a fixed categorical effect
+1. Fit a mixed effects regression model with ethnicity as a random effect
+
+What are the advantages and disadvantages of each?
+
+## Fit using lm
+
+\small
+```{r}
+summary(lm(y ~ x_centered + as.factor(eth), data = dat))
+```
+
+## A fit using lme
+
+Alternatively we can use lme4 to fit a mixed effects model here:
+
+\tiny
+```{r, message=FALSE}
+library(lme4)
+mm_1 = lmer(y ~ x_centered + (1 | eth), data = dat)
+summary(mm_1)
+```
+
+## Look at the effects for each group
+
+```{r}
+coef(mm_1)
+```
+
+- Compare (after a bit of calculation) with the fixed effects model and they should be much more similar to each other
+
+## Why are these two models different?
+
+- The `lmer` model has an extra constraint that:
+$$\alpha_j \sim N(0, \sigma_\alpha^2)$$
+
+- The constraint forces the intercepts to be tied together
+
+- This has two advantages:
+
+    - We get to borrow strength between groups and reduce the effect of tiny (and noisy) sample sizes (look at the standard errors of the intercepts on the fixed effects version)
+    
+    - We can remove the effect of ethnicity from the overall model because we now have an extra estimate of the variability associated with it, via $\sigma_\alpha$
+    
+## Extra plots
+
+The `lme4` package also creates other plots for us:
+```{r, fig.height = 6}
+plot(mm_1)
+```
+
+## Further output
+
+- Confidence intervals
+
+```{r, warning=FALSE}
+confint(mm_1, level = 0.5)
+```
+
+## Plot the random effects
+
+```{r, fig.height = 5}
+library(lattice)
+dotplot(ranef(mm_1))
+```
+
+## Creating predictions - fiddly
+ 
+```{r, fig.height = 5}
+fitted_values = predict(mm_1)
+with(dat, plot(x_centered, y, xlab = 'Height (centered)',
+     ylab = 'log(Earnings)', type = 'n'))
+legend('bottomright', eth_names, col = 1:4, pch = 19)
+with(dat, points(x_centered, fitted_values, col = eth, pch = 19))
+```
 
 
 ## Summary 
 
+- We now know the difference between a _fixed effects_ model and a _mixed effects_ model
+- We have seen some of the key advantages of moving from fitting separately to modelling it jointly
+- We have fitted a model in lme4
+- We have interpreted some of the lme4 output

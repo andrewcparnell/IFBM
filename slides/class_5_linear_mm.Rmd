@@ -1,0 +1,225 @@
+---
+title: 'Class 5: Linear mixed models'
+author: Andrew Parnell\newline \texttt{andrew.parnell@ucd.ie} \newline \vspace{1cm}
+  \newline \includegraphics[width=5cm]{MU_logo.jpg}
+output:
+  beamer_presentation:
+    includes:
+      in_header: header.tex
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(dev = 'pdf')
+#options(width = 40)
+par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
+# setwd("~/GitHub/ecots/slides/day_1")
+# pkgs = c('R2jags','rjags', 'lubridate', 'tidyverse','forecast', 'rstan')
+# lapply(pkgs, library, character.only = TRUE)
+library(lme4)
+```
+
+## Learning outcomes
+
+- Understand more complex linear mixed models
+- Fit some linear mixed models of different types
+- Understand the `lme4` (and `rstanarm`) formula construction
+- Know how to do basic model comparison
+
+## Reminder: earnings data
+
+```{r, echo = FALSE}
+dat = read.csv('../data/earnings.csv')
+eth_names = c('Blacks','Hispanics','Whites','Others')
+with(dat, plot(x_centered, y, xlab = 'Height (centered)',
+     ylab = 'log(Earnings)', type = 'n'))
+with(dat, points(jitter(x_centered, 2), y, col = eth, 
+                 pch = 19))
+legend('bottomright', eth_names, col = 1:4, pch = 19)
+```
+
+## First `lme4` model
+
+\tiny
+```{r}
+mm_1 = lmer(y ~ x_centered + (1 | eth), data = dat)
+summary(mm_1)
+```
+
+## Adding in variable slopes
+
+- This model forces all the fitted lines to be parallel
+
+- i.e. each different ethnic group has the same height/earnings relationship, but shifted up or down
+
+- We can also fit a model with varying slopes
+
+## Varying slopes model
+
+\tiny
+```{r}
+mm_2 = lmer(y ~ (x_centered | eth), data = dat, 
+            control = lmerControl(optimizer = "Nelder_Mead"))
+summary(mm_2)
+```
+
+## A note about `optimizers'
+
+- `lme4` fits the models via REstricted Maximum Likelihood (REML)
+- This parts of the model first (the fixed effects part) and then the random effects second
+- `lme4` comes with a variety of methods for maximising the likelihood. The default is `bobyqa' which seems to fail occasionally. Changing it to one of the other methods often solves the problem
+
+## Interpreting output 1
+
+```{r}
+plot(mm_2)
+```
+
+## Interpreting output 2
+
+```{r}
+coef(mm_2)
+```
+
+- Varying intercepts and quite strongly varying slopes
+
+## Going back to the maths of the different models
+
+- I always find it helpful to write out the mathematical details of the models I am fitting
+
+- The first model (with varying intercepts) had:
+$$y_{ij} = \alpha_j + \beta x_{ij} + \epsilon_{ij}$$
+with $\alpha_j \sim N(0, \sigma_\alpha^2)$ and $\epsilon_{ij} \sim N(0, \sigma^2)$.
+
+- The second model (with varying intercepts and slopes) has:
+$$y_{ij} = \alpha_j + \beta_j x_{ij} + \epsilon_{ij}$$
+with $\alpha_j \sim N(0, \sigma_\alpha^2)$, $\beta_j \sim N(0, \sigma_\beta^2)$ and $\epsilon_{ij} \sim N(0, \sigma^2)$.
+
+- The key job is to always go back and check that you can match the parameters to the estimates in the output
+
+## A third model 
+
+\tiny
+
+- Could also have varying slopes and identical intercepts
+
+```{r}
+mm_3 = lmer(y ~ 1 + (x_centered - 1 | eth), data = dat, 
+            control = lmerControl(optimizer = "Nelder_Mead"))
+summary(mm_3)
+```
+
+- Can you write out the maths for this model and pick out the parameters?
+
+## The dirty secret behind mixed effects models
+
+- Whilst you seem to have a large number of observations (1059 for the earnings example) you only really have 4 observations on the random effects from each of the 4 groups
+
+- Thus the estimates of e.g. the random effect standard deviation is likely to be highly noisy and hard to estimate
+
+- The confidence interval is likely to be big and any assumptions about the distributions of the random effects are likely to be hard to test
+
+## What the formulae mean in `lme4`
+
+\begin{tabular}{lp{7cm}}
+\hline
+Formula  & Meaning \\
+\hline
+`y $\sim$ x` & `y` is the response variable, `x` the single fixed effect with an intercept included too \\
+`y $\sim$ x - 1` & As above but without an intercept term (i.e. $\hat{y} = 0$ when $x = 0$) \\
+`y $\sim$ x + (1 | z)` & As above but with a varying random effect intercept terms grouped by `z` \\
+`y $\sim$ (x | z)` & As above but with varying intercepts and slopes \\
+`y $\sim$ 1 + (x - 1 | z)` & Random effects for slopes but not intercepts \\
+\hline
+\end{tabular}
+
+- There are more complicated formulae which we will come on to later
+
+## Which model fits best?
+
+\tiny
+
+- There are lots of ways to compare models, and we will talk more about this later in the course
+
+- `lmer` implements a simple `anova` method for comparing between two models
+
+```{r}
+anova(mm_1, mm_2, mm_3)
+```
+
+## A quick primer on model comparison
+
+- AIC and BIC are commonly used as they balance the fit of the model (measured by the _deviance_) with the complexity of the model
+
+- Lower values of AIC and BIC tend to indicate a better model
+
+- These are methods for ranking models but not good for telling you whether your best model fits well!
+
+- The deviance can also be used to do a chi-squared test; the $p$-value is in the last column
+
+## A more complicated model
+
+- The earnings data set also has age group in it (1 = 18-34, 2 = 35-49, and 3 = 50-64). 
+
+- Some model ideas:
+
+  - Common slope but varying intercepts by both age group and ethnicity
+  - Varying slopes by age group and varying intercept by ethnicity
+  - Varying slopes by ethnicity and varying intercepts by age group
+  - Varying slopes and intercepts by both
+  
+- Key task: without looking ahead see if you can write out (a) the maths and (b) the `lme4` formula code for each model
+
+## Fitting one of the more complicated models
+
+\tiny
+```{r}
+mm_4 = lmer(y ~ x_centered + (1 | eth) + (1 | age), data = dat, 
+            control = lmerControl(optimizer = "Nelder_Mead"))
+summary(mm_4)
+```
+
+```{r, include = FALSE, eval = FALSE}
+library(sjPlot)
+plot_model(mm_4, type = 're', terms = 'x_centered')
+plot_model(mm_4, type = "diag")
+plot_model(mm_4, type = "eff", terms = c('x_centered', 'eth'))
+plot_model(mm_4, type = "pred", pred.type = 're')
+```
+
+## Comparing this model
+
+\small
+```{r}
+anova(mm_1, mm_3, mm_4)
+```
+
+## Interaction effects
+
+- You might have fitted models previously using `lm` with interaction effects
+```{r, eval = FALSE}
+lm(y ~ x*z)
+```
+
+- When you create models with varying slopes and intercepts you are really creating an interaction model between the continuous covariate (height in our example) and the categorical covariate (ethnicity or age group)
+
+- Remember always that the mixed effects model has the extra constraint that the different groups (or interaction effects) are tied together
+
+## Mathematics for complex mixed effects models
+
+- When we add more variables into the model we need more subscripts
+$$y_{ijk} = \alpha_j + \gamma_k + \delta x_{ijk} + \epsilon_{ijk}$$
+
+- Now $y_{ijk}$ is the log earnings value for observation $i$ in ethnic group $j$ and age group $k$. 
+
+- This model has common slope but random intercepts for age group and ethnic group
+
+- We have the extra constraints $\alpha_j \sim N(0, \sigma_\alpha^2)$, $\gamma_k \sim N(0, \sigma_\gamma^2)$, $\epsilon_{ijk} \sim N(0, \sigma^2)$
+
+## Summary
+
+- We've seen some more complicated models for the earnings data set
+- We know how to fit models with multiple mixed effects
+- We've used `anova` to compare between models
+- We can see how the mathematics and the formula in `lme4` match together
