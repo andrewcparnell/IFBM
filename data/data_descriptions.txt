@@ -6,7 +6,7 @@ fcr.csv is a data set to estimate feed conversion rates in a set of pigs. The va
 
 geese_isotopes.csv contains a bivariate time series in irregular time of geese stable isotope values (d15N and d13C) together with some extra covariates: adult (yes=1 or no=0), male (yes = 1), day, month, year, and Julian day (day through year). Comes from the R package SIAR.
 
-horseshoe.csv contains data from a study (Brockman, Ethology, 1996) on nesting horseshoe crabs. The response variable is satell: the number of satellites (other males residing nearby). The covariates are the female crabs colour (color; 1 = light medium, 2 = medium, 3 = dark medium, 4 = dark), spine condition (1 = both good, 2 = one worn or broken, 3 = both worn or broken), widch (cm), and weight (kg) 
+horseshoe.csv contains data from a study (Brockman, Ethology, 1996) on nesting horseshoe crabs. The response variable is satell: the number of satellites (other males residing nearby). The covariates are the female crabs colour (color; 1 = light medium, 2 = medium, 3 = dark medium, 4 = dark), spine condition (1 = both good, 2 = one worn or broken, 3 = both worn or broken), width (cm), and weight (kg) 
 
 pollen.csv is a set of modern pollen counts and their associated climates. The variables are: GDD5 (Growing degree days about 5C), MTCO (Mean temperature of the coldest mont), pollen counts of spices (Abies - Graminaea). 
 

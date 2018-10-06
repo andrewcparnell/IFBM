@@ -1,6 +1,6 @@
 ---
 title: 'Class 2: Likelihood and Inference'
-author: Andrew Parnell\newline \texttt{andrew.parnell@ucd.ie} \newline \vspace{1cm}
+author: Andrew Parnell\newline \texttt{andrew.parnell@mu.ie} \newline \vspace{1cm}
   \newline \includegraphics[width=5cm]{MU_logo.jpg}
 output:
   beamer_presentation:

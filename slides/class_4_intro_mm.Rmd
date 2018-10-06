@@ -1,6 +1,6 @@
 ---
 title: 'Class 4: Introduction to mixed models'
-author: Andrew Parnell\newline \texttt{andrew.parnell@ucd.ie} \newline \vspace{1cm}
+author: Andrew Parnell\newline \texttt{andrew.parnell@mu.ie} \newline \vspace{1cm}
   \newline \includegraphics[width=5cm]{MU_logo.jpg}
 output:
   beamer_presentation:
@@ -129,7 +129,7 @@ coef(mm_1)
 ## Why are these two models different?
 
 - The `lmer` model has an extra constraint that:
-$$\alpha_j \sim N(0, \sigma_\alpha^2)$$
+$$\alpha_j \sim N(\mu_\alpha, \sigma_\alpha^2)$$
 
 - The constraint forces the intercepts to be tied together
 

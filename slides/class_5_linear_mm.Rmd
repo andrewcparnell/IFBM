@@ -1,6 +1,6 @@
 ---
 title: 'Class 5: Linear mixed models'
-author: Andrew Parnell\newline \texttt{andrew.parnell@ucd.ie} \newline \vspace{1cm}
+author: Andrew Parnell\newline \texttt{andrew.parnell@mu.ie} \newline \vspace{1cm}
   \newline \includegraphics[width=5cm]{MU_logo.jpg}
 output:
   beamer_presentation:
@@ -90,11 +90,11 @@ coef(mm_2)
 
 - The first model (with varying intercepts) had:
 $$y_{ij} = \alpha_j + \beta x_{ij} + \epsilon_{ij}$$
-with $\alpha_j \sim N(0, \sigma_\alpha^2)$ and $\epsilon_{ij} \sim N(0, \sigma^2)$.
+with $\alpha_j \sim N(\mu_\alpha, \sigma_\alpha^2)$ and $\epsilon_{ij} \sim N(0, \sigma^2)$.
 
 - The second model (with varying intercepts and slopes) has:
 $$y_{ij} = \alpha_j + \beta_j x_{ij} + \epsilon_{ij}$$
-with $\alpha_j \sim N(0, \sigma_\alpha^2)$, $\beta_j \sim N(0, \sigma_\beta^2)$ and $\epsilon_{ij} \sim N(0, \sigma^2)$.
+with $\alpha_j \sim N(\mu_\alpha, \sigma_\alpha^2)$, $\beta_j \sim N(\mu_\beta, \sigma_\beta^2)$ and $\epsilon_{ij} \sim N(0, \sigma^2)$.
 
 - The key job is to always go back and check that you can match the parameters to the estimates in the output
 
@@ -215,7 +215,7 @@ $$y_{ijk} = \alpha_j + \gamma_k + \delta x_{ijk} + \epsilon_{ijk}$$
 
 - This model has common slope but random intercepts for age group and ethnic group
 
-- We have the extra constraints $\alpha_j \sim N(0, \sigma_\alpha^2)$, $\gamma_k \sim N(0, \sigma_\gamma^2)$, $\epsilon_{ijk} \sim N(0, \sigma^2)$
+- We have the extra constraints $\alpha_j \sim N(\mu_\alpha, \sigma_\alpha^2)$, $\gamma_k \sim N(\mu_\gamma, \sigma_\gamma^2)$, $\epsilon_{ijk} \sim N(0, \sigma^2)$
 
 ## Summary
 
