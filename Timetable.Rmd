@@ -28,7 +28,7 @@ Time  | Class
 
 Time  | Class
 ------------- | ----------------------------------------------------
-9:30-10:30 | Introduction to mixed models [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/class_4_intro_mms.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/class_4_intro_mms_handout.pdf)
+9:30-10:30 | Introduction to mixed models [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/class_4_intro_mm.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/class_4_intro_mm_handout.pdf)
 10:30-10:45 | Coffee break
 10:45-11:45 | Linear Mixed Models [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/class_5_linear_mm.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/class_5_linear_mm_handout.pdf)
 11:45-12:00 | Break 
