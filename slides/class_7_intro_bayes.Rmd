@@ -1,16 +1,20 @@
 ---
-title: 'Class 3: An introduction to Bayesian Statistics'
-author: Andrew Parnell \newline \texttt{andrew.parnell@ucd.ie} \newline \vspace{1cm}
-  \newline \includegraphics[width=1cm]{UCDlogo.pdf}
+title: 'Class 7: An introduction to Bayesian Statistics'
+author: Andrew Parnell\newline \texttt{andrew.parnell@mu.ie} \newline \vspace{1cm}
+  \newline \includegraphics[width=5cm]{MU_logo.jpg}
 output:
   beamer_presentation:
     includes:
       in_header: header.tex
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(dev = 'pdf')
 par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
+library(rstanarm)
+options(mc.cores = parallel::detectCores())
 ```
 
 ## Learning outcomes
@@ -73,88 +77,62 @@ $$p(\theta|x) = \frac{p(x|\theta) \times p(\theta)}{p(x)}$$
 Suppose you had some data that looked like this:
 ```{r, echo=FALSE}
 dat = read.csv('../data/earnings.csv')
-with(dat, plot(height_cm, log(earn)))
+with(dat, plot(x_centered, y))
 ```
 
 ## What you are used to doing
 
 \tiny
 ```{r}
-model = lm(log(earn) ~ height_cm, data = dat)
-summary(model)
+mod_lm = lm(y ~ x_centered, data = dat)
+summary(mod_lm)
 ```
 \normalsize
 
 ## What you will now get instead
 
-```{r, echo=FALSE, results='hide', message=FALSE}
-library(rstan)
-rstan_options(auto_write = TRUE)
-options(mc.cores = parallel::detectCores())
-stan_code = '
-data {
-  int<lower=0> N;
-  vector[N] x;
-  vector[N] y;
-}
-parameters {
-  real intercept;
-  real slope;
-  real<lower=0> residual_sd;
-} 
-model {
-  y ~ normal(intercept + slope * x, residual_sd);
-}
-'
-stan_run = stan(data = list(N=nrow(dat), 
-                            y = log(dat$earn),
-                            x = dat$height_cm),
-                model_code = stan_code)
+\tiny
+```{r, message=FALSE}
+library(rstanarm)
+mod_stan = stan_lm(y ~ x_centered, data = dat,
+               prior = R2(location = 0.5, 'mean'))
+mod_stan
 ```
+
+## And yet more detail
+
 \tiny
 ```{r}
-print(stan_run)
+summary(mod_stan)
 ```
-\normalsize 
+
+## And in a slightly neater format
+
+```{r}
+posterior_interval(mod_stan)
+```
 
 ## Using prior information
 
-- The Bayesian model in the previous slide divided up everything into _parameters_ (the intercept, slope and residual standard deviation), and data (the height and log(earnings) values)
+- The Bayesian model (hidden in `stan_lm`) divided up everything into _parameters_ (the intercept, slope and residual standard deviation), and data (the height and log(earnings) values)
 - The software in the background created a posterior probability distribution of the parameters given the data
-- The model I fitted used no _prior information_. However, if we had done a previous experiment that suggested the intercept should be around 9 with standard deviation 0.5 we can put this in the model
+- The model I fitted used vague _prior information_. However, if we had done a previous experiment that suggested that the mean $R^2$ value should be around 0.01 we can put that into the model
 
-## A model with prior information
+## With prior information
 
-```{r, echo=FALSE, results='hide', message=FALSE}
-stan_code_2 = '
-data {
-  int<lower=0> N;
-  vector[N] x;
-  vector[N] y;
-}
-parameters {
-  real intercept;
-  real slope;
-  real<lower=0> residual_sd;
-} model {
-  intercept ~ normal(9, 0.5);
-  y ~ normal(intercept + slope * x, residual_sd);
-}
-'
-stan_run_2 = stan(data = list(N=nrow(dat), 
-                            y = log(dat$earn),
-                            x = dat$height_cm),
-                model_code = stan_code_2)
+```{r, message=FALSE}
+mod_stan_2 = stan_lm(y ~ x_centered, data = dat,
+               prior = R2(location = 0.01, 'mean'))
+posterior_interval(mod_stan_2)
 ```
-\tiny
-```{r}
-print(stan_run_2)
-```
-\normalsize 
 
-## An early example of a Bayesian model
+## What's really happening in the background
 
-- To create the Bayesian version of this model I used the following Stan code:
+- `rstanarm` uses `rstan` to produce these posterior distributions
+- The idea of `rstanarm` is to make it easy to switch from traditional modelling packages (e.g. `lme4`) to Bayesian ones without too many code changes
+- However it does have some very odd ideas about how people include prior information, and is somewhat overly mathematical in its documentation
+
+## The real `stan` code
 
 \scriptsize
 ```{r, eval = FALSE}
@@ -179,14 +157,13 @@ model {
 }
 '
 ```
-\normalsize
 
 ## Understanding the different parts of a Bayesian model
 
 - The likelihood is the probability of observing the data given the parameters. It represents the _data generating process_
 - The prior is the probability distribution of the parameters independent from the current data you have been generated. It often requires care (and philosophy) to choose. More on this later
 - The posterior is the probability distribution of the parameters given the data. It is always the target of our inference
-- The two software packages we will explore (Stan and JAGS), create the posterior distribution for us
+- The two software packages we will explore (`rstanarm` and `rstan`), create the posterior distribution for us
 
 ## Lots of probability distributions
 
@@ -209,48 +186,6 @@ Multivariate Normal, $MVN(\mu,\Sigma)$ & $(-\infty,\infty$) & Multivariate unbou
 \normalsize
 The more probability distributions you know the better you will be at Bayes!
 
-
-## An example: linear regression
-
-- Let's suppose we decide that a straight line will be a good fit for our earnings data
-- A straight line has two parameters, the _slope_ and the _intercept_
-- For a full linear regression model, we also have a parameter for the residual standard deviation
-- If we knew these three values we can simulate some data:
-```{r}
-slope = 6
-intercept = 0.03
-res_sd = 1
-log_earn_sim = rnorm(n = nrow(dat), 
-                     mean = intercept + 
-                       slope * dat$height_cm, 
-                     sd =  res_sd)
-```
-
-## Example continued
-
-- If the data we simulated looked exactly like the real data, we might believe that these are plausible values of the parameters
-- We could do this lots of times with slightly different `slope`, `intercept` and `res_sd` values, and collect all the parameter values that are 'close' to the true data values
-- This would provide us with a list of parameter values that approximately _match_ the data
-- To decide how close the match should be we use the normal distribution to give each set of parameter values a _score_. This score is the likelihood
-
-## Simulating from the prior and the likelihood
-
-- But which values should we choose to simulate our parameters from?
-- We could use vague priors
-```{r}
-slope = rnorm(1, mean = 0, sd = 100)
-intercept = rnorm(1, mean = 0, sd = 100)
-res_sd = runif(1, min = 0, max = 100)
-log_earn_sim = rnorm(n = nrow(dat), 
-                     mean = intercept + 
-                       slope * dat$height_cm, 
-                     sd =  res_sd)
-```
-
-... but this would lead to crazily variable simulated data and we would have a very inefficient algorithm
-
-- The computer software we will use avoids this random simulation and instead focusses on the values of the parameters which score highly on the likelihood and the prior
-
 ## Practical differences between frequentist statistics and Bayes
 
 - In frequentist statistics you tend to get a single best estimate of a parameter and a standard error, often assumed normally distributed, and a p-value
@@ -258,7 +193,7 @@ log_earn_sim = rnorm(n = nrow(dat),
 - In frequentist statistics if the p-value is less than 0.05 you win. If not you cry and try a different model
 - In Bayesian statistics you try to quantify the size of an effect from the posterior distribution, or find a particular posterior probability, e.g. P(slope > 0 given the data). 
 
-## More generally choosing a likelihood and a prior
+## Choosing a likelihood and a prior
 
 - The key to choosing a likelihood is to pick a probability distribution which matches your data, e.g. if it's a continuous measurement and is unbounded then a normal distribution. If it's count data bounded above and below then a Binomial might be appropriate
 - The key to choosing a prior distribution is to choose values which you believe represent the reasonable range that the parameter can take, or come from a related study in the literature
@@ -266,94 +201,14 @@ log_earn_sim = rnorm(n = nrow(dat),
 
 Note: the shape of the distribution of the response variable is usually completely unimportant when choosing the likelihood!
 
-## Stan vs JAGS
+## `rstan` vs `rstanarm`
 
 We will be using two different software tools to calculate posterior distributions. These represent the state of the art for user-friendly, research quality Bayesian statistics.
 
-- Stan positives: very flexible, uses sensible distribution names, everything is declared, lots of documentation support, written by people at the top of the field
-- Stan negatives: cannot have discrete parameters, some odd declaration choices, slower to run code, code tends to be longer
-- JAGS positives: very quick for simple models, no declarations required, a bit older than Stan so more queries answered online
-- JAGS negatives: harder to get complex models running, not as fancy an algorithm as Stan, crazy way of specifying normal distributions
-
-## Posterior computation in Stan
-
-A Stan model looks like this:
-\tiny
-```{r, eval = FALSE}
-stan_code = '
-data {
-  int N;
-  vector[N] x;
-  vector[N] y;
-}
-parameters {
-  real intercept;
-  real slope;
-  real<lower=0> residual_sd;
-} 
-model {
-  // Likelihood
-  y ~ normal(intercept + slope * x, residual_sd);
-  // Priors
-  intercept ~ normal(0, 100);
-  slope ~ normal(0, 100);
-  residual_sd ~ uniform(0, 100);
-}
-'
-```
-\normalsize
-
-## Running a model in Stan
-
-To run the Stan model:
-```{r, eval = FALSE}
-stan_run = stan(data = list(N = nrow(dat), 
-                            y = log(dat$earn),
-                            x = dat$height_cm),
-                model_code = stan_code)
-print(stan_run)
-plot(stan_run)
-```
-
-## Posterior computation in JAGS
-
-The same model in JAGS:
-```{r}
-jags_code = '
-model{
-  # Likelihood
-  for(i in 1:N) {
-    y[i] ~ dnorm(intercept + slope * x[i], 
-                    residual_sd^-2)
-  }
-  # Priors
-  intercept ~ dnorm(0, 100^-2)
-  slope ~ dnorm(0, 100^-2)
-  residual_sd ~ dunif(0, 100)
-}
-'
-```
-
-Note the `^-2` everywhere - JAGS uses precision rather than standard deviation in the normal distribution
-
-## Running the JAGS mdoel
-
-```{r, include = FALSE}
-library(R2jags)
-#library(rjags)
-```
-
-```{r, results = 'hide', message=FALSE}
-jags_run = jags(data = list(N = nrow(dat), 
-                            y = log(dat$earn),
-                            x = dat$height_cm),
-                parameters.to.save = c('intercept',
-                                       'slope',
-                                       'residual_sd'),
-                model.file = textConnection(jags_code))
-print(jags_run)
-plot(jags_run)
-```
+- `rstan` positives: very flexible, uses sensible distribution names, everything is declared, lots of documentation support, written by people at the top of the field
+- `rstan` negatives: cannot have discrete parameters, some odd declaration choices, slower to run code, code tends to be longer
+- `rstanarm` positives: very quick for simple models, code looks very similar to `lme4`, no declarations required
+- `rstanarm` negatives: confusing prior distributions, not as well documented, not as much flexibility in model choice
 
 ## Calculating the posterior vs sampling from it
 
@@ -364,10 +219,14 @@ plot(jags_run)
 
 - Number 1 is impractical once you move beyond a few parameters, so number 2 is used by almost everybody
 - This means that we create _samples_ from the posterior distribution. Here are three samples from the earnings example:
+
+\tiny
 ```{r,echo=FALSE}
-parameters = data.frame(extract(stan_run))
-head(parameters, 3)
+head(as.data.frame(mod_stan), 3)
 ```
+
+\normalsize
+
 - We often create thousands of posterior samples to represent the posterior distribution
 
 ## Things you can do with posterior samples
@@ -384,7 +243,7 @@ The posterior distribution will usually be stored in a matrix where each row is 
 For:
 
 - A Bayesian model can be simply displayed as a likelihood and a prior. Everything is explicit
-- JAGS/Stan finds the posterior distribution for us so we don't need to do any maths
+- Stan finds the posterior distribution for us so we don't need to do any maths
 - We can get exactly the quantity we are interested in, the probability distribution of our unknowns given our knowns
 
 Against:
@@ -438,4 +297,6 @@ Bayesian hierarchical modelling is a great way to stop using p-values and start 
 
 - We usually create and analyse samples from the posterior probability distribution of the unknowns (the parameters) given the knowns (the data)
 
-- From the posterior distribution we can create means, medians, standard deviations, credible intervals, etc, from samples we take using e.g. JAGS or Stan
+- From the posterior distribution we can create means, medians, standard deviations, credible intervals, etc, from samples we take using e.g. `rstanarm` or `rstan`
+
+

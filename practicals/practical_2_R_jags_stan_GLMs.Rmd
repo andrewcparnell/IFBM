@@ -1,5 +1,5 @@
 ---
-title: "Practical 2 - Using R, JAGS and Stan for fitting GLMs"
+title: "Practical 2 - Exercises in lme 4"
 author: "Andrew Parnell"
 output:
   pdf_document: default

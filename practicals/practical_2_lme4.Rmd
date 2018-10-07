@@ -1,0 +1,191 @@
+---
+title: "Practical 2 - Exercises in lme 4"
+author: "Andrew Parnell"
+output:
+  pdf_document: default
+  html_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+rm(list=ls()) # Clear the workspace
+knitr::opts_chunk$set(echo = TRUE)
+library(R2jags)
+library(rstan)
+```
+
+## Introduction
+
+Welcome to Practical 2, some exercises in `lme4`. In this practical we will 
+
+- Fit some basic linear mixed models and generalised linear mixed models
+- Explore the output
+- Create some plots using lattice
+
+As in the previous practical you will see the code in gray boxes, and questions you should try to answer separated by horizontal lines. The answers to the problems are in the `.Rmd` file in the practicals folder, but please try not to look at them until you are really stuck!
+
+***
+**Exercise 1**
+
+Go back and make sure you're happy with all the code from today's lectures.
+
+***
+
+## Linear mixed effects models
+
+Let's start by fitting a linear mixed model to a new data set. We're going to use the `prostate` data set in the `data` folder. The response variable is going to be `lpsa` the log of the prostate specific antigen value. All the others variables in the data set are the covariates but we are going to focus specifically on the continuous covariate `lcavol` (the log of the cancer volume) and the discrete covariate `gleason` which gives the Gleason grade (a measure of how severe the cancer is). 
+
+***
+**Exercise 2**
+
+1. Load in the data and use suitable plotting commands to look at the relationship between the response and the covariate, possibly also varying by the discrete covariate
+1. Fit a fixed effects model to the data, first with just `lcavol` and then with an interaction term between `lcavol` and `gleason`. Try to interpret the output (hint: make sure `gleason` is a factor). 
+1. Fit a set of mixed effects models with varying intercepts and/or slopes for the model above using the `lmer` function. Create some plots and tables to verify the residuals and check the varying nature of the random effects. Compare the random effects to the fixed effect values you got in the previous step. 
+1. Compare the models using the `anova` command and decide on a best model for yourself. (Hint: if you also want to compare the fixed effects models you can extract the `AIC` or `BIC` from them using with their synonymous functions)
+
+***
+
+```{r, include = FALSE, eval = FALSE}
+# 1
+prostate = read.csv('../data/prostate.csv')
+with(prostate, plot(lcavol, lpsa))
+library(lattice)
+xyplot(lpsa ~ lcavol|as.factor(gleason), prostate, 
+       type='p',layout=c(1,4))
+# 2 
+mod_1 = lm(lpsa ~ lcavol, data = prostate)
+summary(mod_1)
+mod_2 = lm(lpsa ~ lcavol:as.factor(gleason), data = prostate)
+summary(mod_2)
+# 3
+library(lme4)
+mod_3 = lmer(lpsa ~ lcavol+ ( 1| gleason), data = prostate)
+summary(mod_3)
+plot(mod_3)
+dotplot(ranef(mod_3))
+mod_4 = lmer(lpsa ~ (lcavol | gleason), data = prostate)
+summary(mod_4)
+plot(mod_4)
+dotplot(ranef(mod_4))
+# 4
+AIC(mod_1)
+AIC(mod_2)
+anova(mod_3, mod_4)
+```
+
+This data set also contains a column called `train` which splits the data into a training set and a test set. We would like to fit your chosen model to the training set and see how it performs on the test set. 
+
+***
+**Exercise 3**
+
+1. Subset the data so you are left with just the rows where `train == T`. Fit your best mixed effects model to that data set and check performance
+1. Use the `predict` function to get predicted values of `lpsa` for the training set data. Check that the predictions agree with the true values (via e.g. a plot or a correlation score)
+1. Now use the `predict` function to get predictions for the data you removed (i.e. `train == F`). See if you can produce predictions that remove the effect of the random effects (hint: the `predict.merMod` help file). Do the random effects improve the test set predictions?
+1. Is splitting it into training and test sets a fair test of the model?
+
+***
+
+```{r, include = FALSE, eval = FALSE}
+# 1
+prostate_train = subset(prostate, train == T)
+prostate_test = subset(prostate, train == F)
+mod_3_train = lmer(lpsa ~ lcavol+ (1| gleason), data = prostate_train)
+summary(mod_3_train)
+plot(mod_3_train)
+# 2
+fitted = predict(mod_3_train, newdata = prostate_train)
+plot(fitted, prostate_train$lpsa)
+abline(a = 0, b = 1, col = 'red')
+cor(fitted, prostate_train$lpsa)
+# 3
+pred_test = predict(mod_3_train, newdata = prostate_test)
+plot(pred_test, prostate_test$lpsa)
+abline(a = 0, b = 1, col = 'red')
+cor(pred_test, prostate_test$lpsa)
+pred_test_no_re = predict(mod_3_train, newdata = prostate_test, re.form = NA)
+plot(pred_test_no_re, prostate_test$lpsa)
+abline(a = 0, b = 1, col = 'red')
+cor(pred_test_no_re, prostate_test$lpsa)
+# 4
+# No - would be fair if we had chosen the model on the training set alone but we actually chose it based on all the data.
+```
+
+## A generalised linear mixed model example
+
+Let's move on to a glmm example. We're going to use the `pollen` data set, which is a set of pollen counts which vary by two climate markers. We're going to use the response variable `Betula` (Birch). The two covariates (both continuous) are Mean Temperature of the coldest month (MTCO) and Growing Degree Days above 5 (GDD5; also known as the annual temperature sum above 5 degrees).
+
+***
+**Exercise 4**
+
+1. Load in the data and standardise the two climate variables using `scale`. create a plot of the count against each of the continuous covariates. Also see if you can plot the counts against both variables simultaneously (harder)
+1. Try and fit some fixed effects glms to the data to get an idea of the relationships. Make sure to check the diagnostics
+
+***
+
+```{r, include = FALSE, eval = FALSE}
+# 1
+pollen = read.csv('../data/pollen.csv')
+head(pollen)
+pollen$GDD5_scale = scale(pollen$GDD5)
+pollen$MTCO_scale = scale(pollen$MTCO)
+with(pollen, plot(GDD5_scale, Betula))
+with(pollen, plot(MTCO_scale, Betula))
+with(pollen, plot(GDD5_scale, MTCO_scale))
+with(pollen, plot(GDD5_scale, MTCO_scale, pch = 19, cex = Betula/5000))
+# The fields package might provide a better version - perhaps quilt plots?
+# 2
+mod_1 = glm(Betula ~ GDD5_scale, family = poisson(link = log), data = pollen)
+summary(mod_1)
+plot(mod_1)
+mod_2 = glm(Betula ~ GDD5_scale + I(GDD5_scale^2), family = poisson(link = log), data = pollen)
+summary(mod_2)
+plot(mod_2)
+mod_3 = glm(Betula ~ GDD5_scale*MTCO_scale + I(GDD5_scale^2) + I(MTCO_scale^2), family = poisson(link = log), data = pollen)
+summary(mod_3)
+plot(mod_3)
+# Really need a spatial model here but not covered in this course
+# Could also look at AIC values here
+```
+
+To fit some glmms, we're going to partition the `MTCO` variable into 4 levels. We're then going to fit some Poisson and negative binomial models to see which works best. Be aware that some of the relationships are non-linear and getting models which fit the data well is challenging! 
+
+***
+**Exercise 5**
+
+1. Create a new variable `MTCO_cut` which is defined as: `cold_winter` if `MTCO` $\le$ 17, `mild_winter` if -17 $<$ `MTCO` $\le$ -8, `warm_winter` if -8 < `MTCO` $\le$ 0, and `hot_winter` if `MTCO` > 0. Hint: use the `cut` function. Create a table of `MTCO_cut` values and see if 1. Fit some initial Poisson glmms, perhaps using the structure you might have learnt from the previous exercise (i.e. perhaps a non-linear relationship?). Check the fit of these models 
+1. Fit some Negative Binomial glmms. Note that to do this you have to use the `glmer.nb` function which means you don't need a `family` command but otherwise all is the same. Does this improve the fit? Use the tools we have learnt to help decide which models are best. 
+***
+
+```{r, include = FALSE, eval = FALSE}
+# 1
+pollen$MTCO_cut = cut(pollen$MTCO, breaks = c(-49, -17, -8, 0, 21),
+                      include.lowest = TRUE,
+                      labels = c('cold_winter', 'mild_winter', 
+                                 'warm_winter', 'hot_winter'))
+table(pollen$MTCO_cut)
+# 2
+mod_4 = glmer(Betula ~ GDD5_scale + (1| MTCO_cut), data = pollen,
+              family = poisson(link = log))
+summary(mod_4)
+plot(mod_4)
+mod_5 = glmer(Betula ~ GDD5_scale + I(GDD5_scale^2) + (1| MTCO_cut), data = pollen,
+              family = poisson(link = log))
+summary(mod_5)
+plot(mod_5)
+# 3
+mod_6 = glmer.nb(Betula ~ GDD5_scale + I(GDD5_scale^2) + (1| MTCO_cut), data = pollen)
+summary(mod_6)
+plot(mod_6)
+anova(mod_4, mod_5, mod_6)
+# Model 6 by far the best, but is it any good?
+pred_mod_6 = predict(mod_6, type = 'response')
+plot(pollen$Betula, pred_mod_6) # NO!
+abline(a=0, b=1, col = 'red')
+cor(pollen$Betula, pred_mod_6) # 0.513 - perhaps not so bad?
+```
+
+## Others exercises
+
+1. If you type `help(package = 'lme4')` it brings up all the functions and data sets in the lme4 library. If you click on a data set it often (but not always) contains code to plot and sometimes fit `lme4` models to the data set. Pick a data set or two and check that you can get their code to run. Sometimes the code is quite advanced but see if you can understand it. If there is no `lmer` or `glmer` code associated with it then try and write a script for it. If there is code then see if you can extend it!
+1. Have a first go at running `lme4` on your chosen data set. Try and fit the simplest possible model you can think of first, and slowly make it more complicated. Remember to start with a plot of your data and make sure you keep plotting/tabulating your results to check that it makes sense. 

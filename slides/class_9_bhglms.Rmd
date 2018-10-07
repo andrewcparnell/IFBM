@@ -1,7 +1,7 @@
 ---
-title: 'Class 6: Hierarchical generalised linear models'
-author: Andrew Parnell \newline \texttt{andrew.parnell@ucd.ie} \newline \vspace{1cm}
-  \newline \includegraphics[width=1cm]{UCDlogo.pdf}
+title: 'Class 9: Bayesian Hierarchical Models'
+author: Andrew Parnell\newline \texttt{andrew.parnell@mu.ie} \newline \vspace{1cm}
+  \newline \includegraphics[width=5cm]{MU_logo.jpg}
 output:
   beamer_presentation:
     includes:
