@@ -22,7 +22,7 @@ Time  | Class
 12:45-13:45 | Lunch
 13:45-15:00 | Loading data in R and running simple analysis [(code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/tutor_1_R_basics.R)
 15:00-15:30 | Coffee break
-15:30-17:00 | Using R for linear regression and GLMs [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_example_data.pdf)
+15:30-17:00 | Using R for linear regression and GLMs [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_1_using_R_for_lr_and_glms.pdf)
 
 ## Tuesday 9th October - Mixed models and lme4
 
