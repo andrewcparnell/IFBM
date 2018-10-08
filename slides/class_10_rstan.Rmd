@@ -1,0 +1,170 @@
+---
+title: 'Class 10: Moving from `rstanarm` to `rstan`
+author: Andrew Parnell\newline \texttt{andrew.parnell@mu.ie} \newline \vspace{1cm}
+  \newline \includegraphics[width=5cm]{MU_logo.jpg}
+output:
+  beamer_presentation:
+    includes:
+      in_header: header.tex
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(dev = 'pdf')
+par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
+library(rstanarm)
+library(bayesplot)
+```
+
+## Learning outcomes:
+
+- Start using `rstan` instead of `rstanarm`
+- Be able to fit more flexible models
+- Interpret output from `rstan` models
+
+## Main differences
+
+- `rstanarm` fits most models in one line very quickly, but it only fits a few of the main types of models (mainly regression models)
+- `rstan` can fit a much wider variety of models
+- `rstan` gives you much more control over prior distributions
+- `rstan` takes a long time to compile each model before it starts running
+
+## Modelling set-up in `rstan`
+
+1. Write some stan code and save it in a `rstan` file or in a text string
+1. Save your data in a list with all the named components matching the `data` part of the stan code
+1. Use the `stan` function to fit the model
+1. Use `plot`, `summary`, etc to look at the output
+
+## Linear regression in rstan
+
+```{r}
+stan_code = '
+data {
+  int N;
+  vector[N] x;
+  vector[N] y;
+}
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> residual_sd;
+} 
+model {
+  // Likelihood
+  y ~ normal(intercept + slope * x, residual_sd);
+  // Priors
+  intercept ~ normal(0, 100);
+  slope ~ normal(0, 100);
+  residual_sd ~ uniform(0, 100);
+}
+'
+```
+
+## Key features of `rstan` code
+
+- Three blocks for most models
+
+    - `data` must declare all the objects that are fixed throughout the code
+    - `parameters` can only include objects which are given prior distributions
+    - `model` contains the priors and the likelihoods
+    
+- Other blocks we will use later
+    
+## Fitting the models
+
+```{r}
+earnings = read.csv('../data/earnings.csv')
+library(rstan)
+#options(mc.cores = parallel::detectCores())
+stan_run = stan(data = list(N = nrow(earnings), 
+                            y = earnings$y,
+                            x = earnings$x_centered),
+                model_code = stan_code)
+```
+
+## Looking at output
+
+\tiny
+```{r}
+print(stan_run)
+```
+
+## Looking at output 2
+
+```{r}
+plot(stan_run)
+```
+
+## An alternative way of setting the model up
+
+\small
+```{r, eval = FALSE}
+stan_code = '
+data {
+  int N;
+  vector[N] x;
+  vector[N] y;
+}
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> residual_sd;
+} 
+transformed parameters {
+  vector[N] fits;
+  for (i in 1:N) {
+    fits[i] = intercept + slope * x[i];
+  }
+}
+model {
+  // Likelihood
+  y ~ normal(fits, residual_sd);
+  // Priors
+  intercept ~ normal(0, 100);
+  slope ~ normal(0, 100);
+  residual_sd ~ uniform(0, 100);
+}
+'
+```
+
+## Flexibility in prior distributions
+
+- Because we are writing out the model directly we can change the priors exactly how we want them
+- For example, if we wanted to force the slope to be positive we could 
+
+
+## Looking at posterior output
+
+
+## Mixed effects models in rstan
+
+
+## Creating predictions by hand
+
+
+## Creating posterior predictive values by hand
+
+
+
+
+
+
+## Model comparison in `rstan` (and `rstanarm`)
+
+
+
+## Linear regression in `s
+
+
+
+
+
+
+## Summary
+
+- We have now seen a number of different types of hierarchical GLM
+- Many of the ideas of hierarchical linear models transfer over, but we can explore richer behaviour with hierarchical GLMs
+- These have all used the normal, binomial or Poisson distribution at the top level, and have allowed for over-dispersion, robustness, and ordinal data, to name just three
+

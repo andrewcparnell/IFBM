@@ -1,5 +1,5 @@
 ---
-title: "Practical 2 - Exercises in lme 4"
+title: "Practical 2 - Exercises in `lme4`"
 author: "Andrew Parnell"
 output:
   pdf_document: default
@@ -11,8 +11,6 @@ editor_options:
 ```{r setup, include=FALSE}
 rm(list=ls()) # Clear the workspace
 knitr::opts_chunk$set(echo = TRUE)
-library(R2jags)
-library(rstan)
 ```
 
 ## Introduction
@@ -81,7 +79,7 @@ This data set also contains a column called `train` which splits the data into a
 
 1. Subset the data so you are left with just the rows where `train == T`. Fit your best mixed effects model to that data set and check performance
 1. Use the `predict` function to get predicted values of `lpsa` for the training set data. Check that the predictions agree with the true values (via e.g. a plot or a correlation score)
-1. Now use the `predict` function to get predictions for the data you removed (i.e. `train == F`). See if you can produce predictions that remove the effect of the random effects (hint: the `predict.merMod` help file). Do the random effects improve the test set predictions?
+1. Now use the `predict` function to get predictions for the data you removed (i.e. `train == F`). See if you can produce predictions that remove the effect of the random effects (hint: see the `predict.merMod` help file). Do the random effects improve the test set predictions?
 1. Is splitting it into training and test sets a fair test of the model?
 
 ***

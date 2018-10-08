@@ -1,0 +1,201 @@
+---
+title: "Practical 3 - Exercises in `rstanarm`"
+author: "Andrew Parnell"
+output:
+  pdf_document: default
+  html_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+rm(list=ls()) # Clear the workspace
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Welcome to Practical 3, some exercises in `rstanarm`. In this practical we will 
+
+- Fit some basic linear mixed models and generalised linear mixed models
+- Explore the output
+- Create some plots using `bayesplot`
+
+This practical sticks to the same format/questions as practical 2 but uses `rstanarm` instead for producing the results.
+
+***
+**Exercise 1**
+
+Go back and make sure you're happy with all the code from today's lectures.
+
+***
+
+## Linear mixed effects models
+
+Let's start by fitting a linear mixed model to a new data set. We're going to use the `prostate` data set in the `data` folder. The response variable is going to be `lpsa` the log of the prostate specific antigen value. All the others variables in the data set are the covariates but we are going to focus specifically on the continuous covariate `lcavol` (the log of the cancer volume) and the discrete covariate `gleason` which gives the Gleason grade (a measure of how severe the cancer is). 
+
+***
+**Exercise 2**
+
+1. Copy your code in from yesterday to load in the data and use suitable plotting commands to look at the relationship between the response and the covariate, possibly also varying by the discrete .
+1. Fit a fixed effects model to the data using `stan_lm`, first with just `lcavol` and then with an interaction term between `lcavol` and `gleason`. Try to interpret the output (hint: make sure `gleason` is a factor). 
+1. Fit a set of mixed effects models with varying intercepts and/or slopes for the model above using the `stan_lmer` function. Create some plots to verify the fits and check the varying nature of the random effects. Compare the random effects to the fixed effect values you got in the previous step. 
+1. Create a plot of the residuals (y-axis) vs fitted values (x-axis). The answer on how to do this is in the answer script but see if you can find it yourself.
+1. Ensure convergence from the $\hat{R}$ values. Compute a posterior predictive check of the models using `pp_check` and determine which you think fits the data best.
+
+***
+
+```{r, include = FALSE, eval = FALSE}
+# 1
+prostate = read.csv('../data/prostate.csv')
+with(prostate, plot(lcavol, lpsa))
+library(lattice)
+xyplot(lpsa ~ lcavol|as.factor(gleason), prostate, 
+       type='p',layout=c(1,4))
+# 2 
+mod_1 = stan_lm(lpsa ~ lcavol, data = prostate,
+                prior = R2(location = 0.5, 'mean'))
+summary(mod_1)
+mod_2 = stan_lm(lpsa ~ lcavol:as.factor(gleason), data = prostate,
+                prior = R2(location = 0.5, 'mean'))
+summary(mod_2)
+# 3
+mod_3 = stan_lmer(lpsa ~ lcavol+ ( 1| gleason), data = prostate)
+summary(mod_3)
+plot(mod_3)
+dotplot(ranef(mod_3)) # This still works!
+mod_4 = stan_lmer(lpsa ~ (lcavol | gleason), data = prostate)
+summary(mod_4)
+plot(mod_4)
+dotplot(ranef(mod_4))
+# 4
+plot(mod_4$linear.predictors, residuals(mod_4))
+# 5
+pp_check(mod_2)
+pp_check(mod_3)
+pp_check(mod_4)
+# Compare models ( haven't covered this yet)
+compare_models(loo(mod_1), 
+               loo(mod_2), 
+               loo(mod_3), 
+               loo(mod_4))
+# Suggest model 3 very slightly better
+# loo_list <- list(fit1 = loo(mod_1), fit2 = loo(mod_2), fit3 = loo(mod_3), 
+#                  fit4 = loo(mod_4))
+# loo_model_weights(loo_list)
+#> Method: stacking
+```
+
+This data set also contains a column called `train` which splits the data into a training set and a test set. We would like to fit your chosen model to the training set and see how it performs on the test set. 
+
+***
+**Exercise 3**
+
+1. Subset the data so you are left with just the rows where `train == T`. Fit your best mixed effects model to that data set and check performance
+1. Use the `posterior_predict` function to get predicted values of `lpsa` for the training set data. Check that the predictions agree with the true values (via e.g. a plot or a correlation score). (Hint: `posterior_predict` will give you a full set of posterior samples which you will need to summarise using apply)
+1. Now use the `posterior_predict` function to get predictions for the data you removed (i.e. `train == F`). See if you can produce predictions that remove the effect of the random effects (hint: see the `posterior_predict` help file). Do the random effects improve the test set predictions?
+
+***
+
+```{r, include = FALSE, eval = FALSE}
+# 1
+prostate_train = subset(prostate, train == T)
+prostate_test = subset(prostate, train == F)
+mod_3_train = stan_lmer(lpsa ~ lcavol+ (1| gleason), data = prostate_train)
+summary(mod_3_train)
+plot(mod_3_train)
+# 2
+fitted = apply(posterior_predict(mod_3_train, newdata = prostate_train), 2, 'mean')
+plot(fitted, prostate_train$lpsa)
+abline(a = 0, b = 1, col = 'red')
+cor(fitted, prostate_train$lpsa)
+# 3
+pred_test = apply(posterior_predict(mod_3_train, newdata = prostate_test), 2, 'mean')
+plot(pred_test, prostate_test$lpsa)
+abline(a = 0, b = 1, col = 'red')
+cor(pred_test, prostate_test$lpsa)
+pred_test_no_re = apply(posterior_predict(mod_3_train, newdata = prostate_test, re.form = NA), 2, 'mean')
+plot(pred_test_no_re, prostate_test$lpsa)
+abline(a = 0, b = 1, col = 'red')
+cor(pred_test_no_re, prostate_test$lpsa)
+```
+
+## A generalised linear mixed model example
+
+Let's move on to a glmm example. We're going to use the `pollen` data set, which is a set of pollen counts which vary by two climate markers. We're going to use the response variable `Betula` (Birch). The two covariates (both continuous) are Mean Temperature of the coldest month (MTCO) and Growing Degree Days above 5 (GDD5; also known as the annual temperature sum above 5 degrees).
+
+***
+**Exercise 4**
+
+1. Load in the data and standardise the two climate variables using `scale`. create a plot of the count against each of the continuous covariates. Also see if you can plot the counts against both variables simultaneously (harder)
+1. Try and fit some fixed effects glms to the data to get an idea of the relationships. Make sure to check the diagnostics
+
+***
+
+```{r, include = FALSE, eval = FALSE}
+# 1
+pollen = read.csv('../data/pollen.csv')
+head(pollen)
+pollen$GDD5_scale = scale(pollen$GDD5)
+pollen$MTCO_scale = scale(pollen$MTCO)
+with(pollen, plot(GDD5_scale, Betula))
+with(pollen, plot(MTCO_scale, Betula))
+with(pollen, plot(GDD5_scale, MTCO_scale))
+with(pollen, plot(GDD5_scale, MTCO_scale, pch = 19, cex = Betula/5000))
+# The fields package might provide a better version - perhaps quilt plots?
+# 2
+mod_1 = stan_glm(Betula ~ GDD5_scale, family = poisson(link = log), data = pollen)
+summary(mod_1)
+plot(mod_1)
+mod_2 = stan_glm(Betula ~ GDD5_scale + I(GDD5_scale^2), 
+                 family = poisson(link = log), data = pollen)
+summary(mod_2)
+plot(mod_2)
+mod_3 = stan_glm(Betula ~ GDD5_scale*MTCO_scale + I(GDD5_scale^2) + I(MTCO_scale^2), family = poisson(link = log), data = pollen)
+summary(mod_3)
+plot(mod_3)
+# Really need a spatial model here but not covered in this course
+# Also need to look at posterior predictive and loo/waic values
+```
+
+To fit some glmms, we're going to partition the `MTCO` variable into 4 levels. We're then going to fit some Poisson and negative binomial models to see which works best. Be aware that some of the relationships are non-linear and getting models which fit the data well is challenging! 
+
+***
+**Exercise 5**
+
+1. From yesterday, create a new variable `MTCO_cut` which is defined as: `cold_winter` if `MTCO` $\le$ 17, `mild_winter` if -17 $<$ `MTCO` $\le$ -8, `warm_winter` if -8 < `MTCO` $\le$ 0, and `hot_winter` if `MTCO` > 0. Hint: use the `cut` function. Create a table of `MTCO_cut` values and see if 1. Fit some initial Poisson glmms, perhaps using the structure you might have learnt from the previous exercise (i.e. perhaps a non-linear relationship?). Check the fit of these models 
+1. Fit some Negative Binomial glmms. Note that to do this you have to use the `stan_glmer.nb` function which means you don't need a `family` command but otherwise all is the same. Does this improve the fit? Use the tools we have learnt to help decide which models are best. 
+***
+
+```{r, include = FALSE, eval = FALSE}
+# 1
+pollen$MTCO_cut = cut(pollen$MTCO, breaks = c(-49, -17, -8, 0, 21),
+                      include.lowest = TRUE,
+                      labels = c('cold_winter', 'mild_winter', 
+                                 'warm_winter', 'hot_winter'))
+table(pollen$MTCO_cut)
+# 2
+mod_4 = stan_glmer(Betula ~ GDD5_scale + (1| MTCO_cut), data = pollen,
+              family = poisson(link = log))
+summary(mod_4)
+plot(mod_4)
+mod_5 = stan_glmer(Betula ~ GDD5_scale + I(GDD5_scale^2) + (1| MTCO_cut), data = pollen,
+              family = poisson(link = log))
+summary(mod_5)
+plot(mod_5)
+# 3
+mod_6 = stan_glmer.nb(Betula ~ GDD5_scale + I(GDD5_scale^2) + (1| MTCO_cut), data = pollen)
+summary(mod_6)
+plot(mod_6)
+anova(mod_4, mod_5, mod_6)
+# Model 6 by far the best, but is it any good?
+pred_mod_6 = apply(posterior_predict(mod_6, type = 'response'), 2, 'mean')
+plot(pollen$Betula, pred_mod_6) # NO!
+abline(a=0, b=1, col = 'red')
+cor(pollen$Betula, pred_mod_6)
+```
+
+## Others exercises
+
+1. Tomorow we will be using `rstan` to fit some of these models instead. See if you can translate some of the simpler models into `rstan` format. Note this will involve reading ahead a bit in the notes. 
+1. Have a first go at running `rstanarm` on your chosen data set. Try and fit the simplest possible model you can think of first, and slowly make it more complicated. Remember to start with a plot of your data and make sure you keep plotting/tabulating your results to check that it makes sense. 

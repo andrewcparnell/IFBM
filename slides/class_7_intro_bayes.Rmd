@@ -14,7 +14,7 @@ editor_options:
 knitr::opts_chunk$set(dev = 'pdf')
 par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
 library(rstanarm)
-options(mc.cores = parallel::detectCores())
+#options(mc.cores = parallel::detectCores())
 ```
 
 ## Learning outcomes
