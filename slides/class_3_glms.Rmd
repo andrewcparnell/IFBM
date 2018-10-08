@@ -34,7 +34,7 @@ par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
 ## Linear regression example
 
 Here is some data on sea level rise:
-```{r}
+```{r, fig.height = 5}
 sl = read.csv('../data/tide_gauge.csv')
 with(sl, plot(year_AD, sea_level_m))
 ```
@@ -58,7 +58,7 @@ where $\alpha$ is the intercept, $\beta$ the slope, and $i=1, \ldots, N$ represe
 - Usually we make the additional assumption that $\epsilon_i \sim N(0, \sigma^2)$ where $\sigma$ is the residual standard deviation
 
 - Writing this in probability distributions: 
-$$y_i|x_i, \alpha, \beta, \sigma \sim N(\alpha + \beta x_i, \sigma^2)$$. 
+$$y_i|x_i, \alpha, \beta, \sigma \sim N(\alpha + \beta x_i, \sigma^2)$$
 
 ## Fiting linear regression models
 
@@ -156,20 +156,23 @@ head(whitefly, 4)
 ```{r, fig.height = 6}
 barplot(table(whitefly$live))
 ```
+
 - Doesn't really show the whole story as we're ignoring the total
 
 ## Second go
 
-```{r, fig.height = 6}
+```{r, fig.height = 5}
 hist(whitefly$live/whitefly$n, breaks = 30)
 ```
+
 - Better, but actually there is also a covariate in the number of immature whitefly that were included (variable `imm`)
 
 ## Third go
 
-```{r, fig.height = 6}
+```{r, fig.height = 5}
 plot(whitefly$imm, whitefly$live/whitefly$n)
 ```
+
 - Looks like the more immature whitefly there were, the more likely they were to survive
 
 ## Fitting a model
@@ -217,11 +220,15 @@ lines(x, alpha + beta * x, col = 'red')
 ## The logit function
 
 \small 
+
 - To stop the lines going out of the range (0, 1) people often use the _logit_ transformation:
+
 $$\log \left[ \frac{p}{1-p} \right] = \alpha + \beta x \mbox{ or } p = \frac{e^{\alpha + \beta x}}{e^{\alpha + \beta x} + 1}$$
+
 - The latter is known as the inverse logit function
 
 - We now maximise the likelihood:
+
 ```{r}
 p = exp(alpha + beta * x) / (exp(alpha + beta * x) + 1)
 sum(dbinom(y, n, p, log = TRUE))
@@ -238,7 +245,7 @@ sum(dbinom(y, n, inv.logit(alpha + beta * x), log = TRUE))
 
 - Suppose under this method we got maximum likelihood estimates of $\hat{\alpha} = -2$ and $\hat{\beta} = 0.05$
 - A plot of the fitted values is now:
-```{r, fig.height = 5}
+```{r, fig.height = 3}
 alpha = -2
 beta = 0.05
 o = order(x)

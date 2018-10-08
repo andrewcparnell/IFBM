@@ -4,6 +4,8 @@ author: "Andrew Parnell"
 output:
   pdf_document: default
   html_document: default
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -24,7 +26,7 @@ Welcome to the first user-guided practical on linear regression and GLMs. In thi
 - Fit a Binomial GLM model
 - Fit a Poisson GLM and compare it to a negative binomial one
 
-There are four sections. You should work your way through the questions and put your hand up if you get stuck. There is no answer script so if you're really stumped I can provide you with some sample code.
+There are four sections. You should work your way through the questions and put your hand up if you get stuck. There is no answer script but if you're really stumped I can provide you with some sample code.
 
 ***
 
@@ -51,6 +53,34 @@ Tasks:
  
 1. You can get the AIC of this model with e.g. `AIC(my_model)`. Recall that lower AIC means a better model. Try some more models and see if you can get a lower AIC value. Some ideas might include: interactions between terms (e.g. include `+ Wind*Temp`), quadratic functions (e.g. include `+ I(Wind^2)`), and changing month and day to be factor rather than numerical variables. 
 
+```{r, include = FALSE, eval = FALSE}
+# 1
+pairs(airquality)
+# 2
+mod = lm(Ozone ~ ., data = airquality)
+summary(mod) # Looks like a resonably good fitting model (based on R-squared)
+# 3
+hist(mod$residuals, breaks = 30)
+qqnorm(mod$residuals)
+qqline(mod$residuals) # Very skewed
+# 4
+mod_2 = lm(log(Ozone) ~ ., data = airquality)
+summary(mod_2) # Still looks pretty good here
+hist(mod_2$residuals, breaks = 30)
+qqnorm(mod_2$residuals)
+qqline(mod_2$residuals) # Much better apart from one crazy value!
+# 5
+which.min(mod_2$residuals)
+airquality[21,] # Has an Ozone value of 1!
+# 6
+AIC(mod_2) #173.1773
+mod_3 = lm(log(Ozone) ~ .*. , data = airquality) # All 2-way interactions
+AIC(mod_3) #187.0112
+mod_4 = lm(log(Ozone) ~ .^3 , data = airquality) # All 2-way interactions
+AIC(mod_4) #183.7287
+# Didn't find anything better than first model
+```
+
 ## Task set 2: logistic regression
 
 1. Load in the `horseshoe.csv` data set from the data directory and familiarise yourself with the data structure from the `data_description.txt` file
@@ -67,13 +97,70 @@ Tasks:
 
 1. Try fitting some more models to the data with more variables (and perhaps interactions) to see if you can get the AIC lower. Compare your new models' fitted values to the first model
 
+```{r, include = FALSE}
+# 1
+horseshoe = read.csv('../data/horseshoe.csv')
+head(horseshoe)
+# 2 
+horseshoe$spine_fac = factor(horseshoe$spine, 
+                            labels = c('both_good', 
+                                       'one_worn_or_broken',
+                                       'both_worn_or_broken'))
+horseshoe$color_fac = factor(horseshoe$color, 
+                            labels = c('light_medium', 
+                                       'medium',
+                                       'dark_medium',
+                                       'dark'))
+# 3
+pairs(horseshoe)
+# 4
+horseshoe$satell_bin = as.integer(horseshoe$satell>0)
+# 5
+mod = glm(satell_bin ~ width, family = binomial(link = logit),
+          data = horseshoe)
+summary(mod) # Have enough data to observe an effect
+# 6
+with(horseshoe, plot(width, satell_bin))
+o = order(horseshoe$width)
+lines(horseshoe$width[o], mod$fitted.values[o], col = 'red')
+# Clear increasing probabilities with width
+# 7
+AIC(mod) # 198.4527
+mod_2 = glm(satell_bin ~ width + weight, family = binomial(link = logit),
+          data = horseshoe)
+AIC(mod_2) # 200.0279
+mod_3 = glm(satell_bin ~ width*weight*color_fac, family = binomial(link = logit),
+          data = horseshoe)
+AIC(mod_3) # 202.6617
+```
+
 ## Task set 3: Poisson and Negative Binomial regression
 
 1. This time fit a Poisson GLM to the horseshoe data, using the original number of satellites rather than the binary version you fitted previously. Again use `width` as the sole covariate, and again plot the fitted values
 
 1. Now try a model with all of the covariates (make sure not to include the binary variable you created before). Summarise and see if there's any improvement. You might notice that more variables are important (compared to the previous binary logistic regression) because we're using more of the data
 
-1. A common occurrence is that the Poisson distribution is a poor fit to the data as the mean=variance relationship is rarely met. (You could check if the mean and the variance match for these data). A common alternative is to fit a Negative-Binomial GLM which has an extra parameter to measure excess variance (over-dispersion). The `glm` function doesn't have this distribution in it by default so you need to call in the MASS library with `library(MASS)`. The family will now be called `negative.binomial` and you'll need to specify a value of the excess variance `theta`. The ratio of the variance to the mean of the response would be a good start. Fit a Negative Binomial GLM to these data, interpret your findings, see if the AIC improves, and plot your output.
+1. A common occurrence is that the Poisson distribution is a poor fit to the data as the mean=variance relationship is rarely met. (You could check if the mean and the variance match for these data). A common alternative is to fit a Negative-Binomial GLM which has an extra parameter to measure excess variance (over-dispersion). The `glm` function doesn't have this distribution in it by default so you need to call in the MASS library with `library(MASS)`. The family will now be called `negative.binomial` and you can use the `glm.nb` function to fit the model. This will also estimate the over-dispersion parameter (`theta`). Fit a Negative Binomial GLM to these data, interpret your findings, see if the AIC improves, and plot your output.
+
+```{r, include = FALSE}
+# 1
+mod = glm(satell ~ width, family = poisson(link = log),
+          data = horseshoe)
+summary(mod)
+# 2
+mod_2 = glm(satell ~ . - satell_bin - color - spine, family = poisson(link = log),
+          data = horseshoe)
+summary(mod_2)
+# 3
+library(MASS)
+mod_3 = glm.nb(satell ~ . - satell_bin - color - spine,
+          data = horseshoe)
+summary(mod_3) # Dispersion parameter practically 1 (Poisson ok?)
+AIC(mod) #927.1762
+AIC(mod_2) #923.5498
+AIC(mod_3) #764.9049
+```
+
 
 ## Extra questions
 

@@ -354,7 +354,9 @@ predict(model_1, newdata1, type='response')
 head(mtcars)
 
 # Fit the model:
-model_2 <- glm(vs ~ disp, family=binomial, data=mtcars)
+model_2 = glm(vs ~ disp, 
+              family=binomial, 
+              data=mtcars)
 summary(model_2)
 
 # Prediction for a car with a disp of 180 inches^3
@@ -409,8 +411,7 @@ plot(model_3)
 # read/write.csv, read.table, load, save, scan, saving plots with e.g. pdf
 ############################################################################################################
 # 7.1 Most useful function is probably read.csv
-prostate = read.csv('https://raw.githubusercontent.com/andrewcparnell/bhm_course/master/data/prostate.csv
-')
+prostate = read.csv('data/prostate.csv')
 
 # More general version is read.table
 prostate = read.table('https://web.stanford.edu/~hastie/ElemStatLearn/datasets/prostate.data')

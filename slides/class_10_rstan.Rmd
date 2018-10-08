@@ -1,5 +1,5 @@
 ---
-title: 'Class 10: Moving from `rstanarm` to `rstan`
+title: 'Class 10: Moving from `rstanarm` to `rstan`'
 author: Andrew Parnell\newline \texttt{andrew.parnell@mu.ie} \newline \vspace{1cm}
   \newline \includegraphics[width=5cm]{MU_logo.jpg}
 output:
@@ -22,6 +22,7 @@ library(bayesplot)
 - Start using `rstan` instead of `rstanarm`
 - Be able to fit more flexible models
 - Interpret output from `rstan` models
+- Do some model comparison using LOO and WAIC
 
 ## Main differences
 
@@ -39,6 +40,7 @@ library(bayesplot)
 
 ## Linear regression in rstan
 
+\tiny
 ```{r}
 stan_code = '
 data {
@@ -74,7 +76,7 @@ model {
     
 ## Fitting the models
 
-```{r}
+```{r, warning = FALSE, message=FALSE, results = 'hide'}
 earnings = read.csv('../data/earnings.csv')
 library(rstan)
 #options(mc.cores = parallel::detectCores())
@@ -93,13 +95,13 @@ print(stan_run)
 
 ## Looking at output 2
 
-```{r}
+```{r, fig.height = 6, warning=FALSE, message=FALSE}
 plot(stan_run)
 ```
 
 ## An alternative way of setting the model up
 
-\small
+\tiny
 ```{r, eval = FALSE}
 stan_code = '
 data {
@@ -132,39 +134,309 @@ model {
 ## Flexibility in prior distributions
 
 - Because we are writing out the model directly we can change the priors exactly how we want them
-- For example, if we wanted to force the slope to be positive we could 
+- For example, if we wanted to force the slope to be positive we could put a `gamma` prior on the slope, or change the declaration to `real<lower=0> slope;`
+- A popular prior for standard deviation parameters is the half-cuachy. You will see this lots in the `rstanarm` and `rstan` examples
 
+## Quirks of the stan language
 
-## Looking at posterior output
-
+- Each line must finish with a semi-colon
+- The declarations are a minefield. There seems to be at least 2 ways to specify vectors, and multiple ways to specify matrices. Hopefully they will tidy up in a future version
+- However you can declare other variables on the fly in e.g. the `model` or `transformed parameters` sections
+- Within block it doesn't seem to matter hugely the order the code is in, but the declarations need to be at the top
+- Unlike most or R, everything is strongly typed. You cannot miss anything out of the `parameters` or `data` parts
+- If you can vectorise the likelihood stan will run much faster
 
 ## Mixed effects models in rstan
 
+\tiny
+```{r}
+stan_code_mm = '
+data {
+  int N;
+  int N_eth;
+  vector[N] x;
+  vector[N] y;
+  int eth[N];
+}
+parameters {
+  real intercept[N_eth];
+  real slope;
+  real mean_intercept;
+  real<lower=0> residual_sd;
+  real<lower=0> sigma_slope;
+} 
+model {
+  // Likelihood
+  for (i in 1:N) {
+    y[i] ~ normal(intercept[eth[i]] + slope * x[i], residual_sd);
+  }
+  // Priors
+  slope ~ normal(0, 0.1);
+  for (j in 1:N_eth) {
+    intercept[j] ~ normal(mean_intercept, sigma_slope);
+  }
+  mean_intercept ~ normal(11, 2);
+  sigma_slope ~ cauchy(0, 10);
+  residual_sd ~ cauchy(0, 10);
+}
+'
+```
+
+## Running the hierarchical model
+
+```{r, warning=FALSE, message=FALSE, results = 'hide'}
+stan_run_2 = stan(data = list(N = nrow(earnings), 
+                              y = earnings$y,
+                              x = earnings$x_centered,
+                              eth = earnings$eth,
+                              N_eth = length(unique(earnings$eth))),
+                model_code = stan_code_mm)
+```
+
+## Output 1
+
+\tiny
+```{r}
+print(stan_run_2)
+```
+
+## Output 2
+
+```{r, warning=FALSE, message=FALSE, fig.height = 6}
+plot(stan_run_2)
+```
+
+## Getting directly at the posterior distribution
+
+```{r}
+post = as.data.frame(stan_run_2)
+head(post)
+```
 
 ## Creating predictions by hand
 
+\tiny
+```{r}
+stan_code_3 = '
+data {
+  int N;
+  int N_pred;
+  vector[N] x;
+  vector[N] y;
+  vector[N_pred] x_pred;
+}
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> residual_sd;
+} 
+model {
+  // Likelihood
+  y ~ normal(intercept + slope * x, residual_sd);
+  // Priors
+  intercept ~ normal(0, 100);
+  slope ~ normal(0, 100);
+  residual_sd ~ uniform(0, 100);
+}
+generated quantities {
+  vector[N_pred] y_pred;
+  for (j in 1:N_pred) 
+    y_pred[j] = intercept + slope * x[j];
+}
+'
+```
+
+## Fitting the new model
+
+```{r, warning=FALSE, message=FALSE, results = 'hide'}
+stan_run_3 = stan(data = list(N = nrow(earnings), 
+                              N_pred = 5,
+                              y = earnings$y,
+                              x = earnings$x_centered,
+                              x_pred = seq(-3,3, length = 5)),
+                model_code = stan_code_3)
+
+```
+
+## Extract out the predictions
+
+```{r}
+preds = extract(stan_run_3, 'y_pred')
+head(preds$y_pred)
+```
 
 ## Creating posterior predictive values by hand
 
+\tiny
+```{r}
+stan_code_4 = '
+data {
+  int N;
+  vector[N] x;
+  vector[N] y;
+  vector[N_pred] y_pred;
+}
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> residual_sd;
+} 
+model {
+  // Likelihood
+  y ~ normal(intercept + slope * x, residual_sd);
+  // Priors
+  intercept ~ normal(0, 100);
+  slope ~ normal(0, 100);
+  residual_sd ~ uniform(0, 100);
+}
+generated quantities {
+  vector[N] y_pred;
+  for (j in 1:N) 
+    y_pred[j] = normal_rng(intercept + slope * x[j], residual_sd);
+}
+'
+```
 
+## A stan glmm
 
+\tiny
+```{r}
+stan_code_od_pois = '
+data {
+  int<lower=0> N;
+  int<lower=0> N_trt;
+  int<lower=0> y[N];
+  int trt[N];
+}
+parameters {
+  real beta_trt[N_trt];
+  real trt_mean;
+  real<lower=0> trt_sd;
+}
+model {
+  for (i in 1:N) 
+    y[i] ~ poisson_log(beta_trt[trt[i]]);
 
+  // Priors on coefficients
+  for(j in 1:N_trt)
+    beta_trt[j] ~ normal(trt_mean, trt_sd);
 
+  trt_mean ~ normal(0, 10);
+  trt_sd ~ cauchy(0, 5);
+}
+'
+```
 
 ## Model comparison in `rstan` (and `rstanarm`)
 
+- These two have their own model comparison criteria called WAIC (Widely Applicable Information Criterion) and LOO (Leave one out)
+- We will use both. Philosphically WAIC is the more satisfactory but practically LOO seems to work better
+- WAIC falls under the framework of _Information Criterion_, LOO is slightly different
 
+## Model comparison: an introduction
 
-## Linear regression in `s
+- We can come up with the fanciest model in the world but if it does not meet our desired goals (either prediction or causation) then we cannot publish or use it
+- You can broadly split model comparison into two parts: _absolute_ model comparison and _relative_ model comparison
+- In absolute model comparison, we are looking at how well a specific model fits the data at hand
+- In relative model comparison, we can only look at how well a set of models performs on the same data with the goal of choosing the best one (or group)
 
+## Relative model comparison: model information criteria
 
+- You might have come across these before: Akaike Information Criterion (AIC), Bayesian Information Criterion (BIC)
+- The general idea is that the score on the likelihood is a good measure of model fit, except for the fact that more complex models will generally have higher likelihood scores
+- If we penalise these scores by some measure of the complexity of the model then we can compare models across complexities
+- The usual measure of complexity is some function of the number of parameters
+- Because these are relative model comparisons, the best model acording to an IC might still be useless!
 
+## Different types of information criteria
 
+- For various historical reasons, people tend to transform the likelihood score into the _deviance_, which is minus twice the log-likelihood score
+- They then add a model complexity term onto it
+- The two most common ICs are:
+$$\mbox{AIC}: - 2 \log L + 2p$$
+$$\mbox{BIC}: - 2 \log L + p \log n$$
+where $p$ is the number of parameters and $n$ is the number of observations
+- We usually pick the smallest values of these across different models
 
+## Information criteria for Hierarchical models
+
+- For Bayesian models it's hard to know which value of $L$ to use, seeing as at each iteration we get a different likelihood score. 
+- Two specific versions of IC have been developed for these situations
+- The first, called the _Deviance Information Criteria_ (DIC) is calculated via:
+$$\mbox{DIC}: - 2 \log L_{\mbox{max}} + 2p_D$$
+where $p_D$ is the _effective number of parameters_
+- The second called the Widely Applicable Information Criterion (WAIC) which is calculated as:
+$$\mbox{WAIC}: - 2 \log L_{\mbox{max}} + p_{\mbox{WAIC}}$$
+- Here $p_{\mbox{WAIC}}$ is a measure of the variability of the likelihood scores
+
+## Which information criterion should I use?
+
+- WAIC and DIC are built for Bayesian hierarchical models
+- DIC was traditionally used everywhere but has fallen out of favour
+- WAIC is included in the `loo` package which is installed alongside Stan
+- WAIC is considered superior as it also provides uncertainties on the values. Most of the others just give a single value
+- More generally there is a philosophical argument about whether we ever want to choose a single best model
+
+## An alternative: cross validation
+
+- Cross validation (CV) works by:
+
+  1. Removing part of the data, 
+  1. Fitting the model to the remaining part, 
+  1. Predicting the values of the removed part, 
+  1. Comparing the predictions with the true (left-out) values
+  
+- It's often fitted repeatedly, as in k-fold CV where the data are divided up into k groups, and each group is left out in turn
+- In smaller data sets, people perform leave-one-out cross-validation (LOO-CV)
+
+## Pros and cons of CV
+
+- We might also run the 5-fold CV on the previous slide for different complexity models and see which had the smallest root mean square error of prediction (RMSEP), i.e. use it as a relative criteria
+- CV is great because it actually directly measures the performance of the model on real data, based on data the model hasn't seen
+- However, it's computationally expensive, and problems occur in hierarchical models if some groups are small, and therefore might get left out of a fold
+- The `loo` function (in the `loo` package) gives an approximation of LOO-CV
+
+## Absolute model comparison
+
+- We've already met posterior predictive distributions, which is essentially leave none out CV. 
+- Another popular one is something called the _Bayes Factor_. This is created by first calculating the posterior distribution of a model given the data, a measure of absolute model fit. The ratios of these can be compared for different models to create a relative model criteria. 
+- However, Bayes Factors are really hard to calculate and often overly sensitive to irrelevant prior choices
+
+## Continuous model expansion
+
+- There are lots of clever ways to set up prior distributions so that a model choice step is part of the model fit itself
+- One way is partial pooling, by which we force e.g. varying slope and intercept parameters to the same value (or not)
+- Another way is to put shrinkage or selection priors on the parameters in the model, possibly setting them to zero
+- More on all of these later in the course
+
+## Example: computing `loo` and `waic` on an `rstanarm` regression model
+
+```{r, message = FALSE, warning=FALSE, results = 'hide'}
+library(loo)
+prostate = read.csv('../data/prostate.csv')
+mod_1 = stan_lmer(lpsa ~ lcavol+ ( 1| gleason), data = prostate)
+mod_2 = stan_lmer(lpsa ~ (lcavol | gleason), data = prostate)
+```
+
+```{r, warning=FALSE}
+loo_1 = loo(mod_1)
+loo_2 = loo(mod_2)
+compare_models(loo_1, loo_2)
+```
+
+## Now with WAIC
+
+```{r, warning=FALSE}
+library(loo)
+prostate = read.csv('../data/prostate.csv')
+waic_1 = waic(mod_1)
+waic_2 = waic(mod_2)
+compare_models(waic_1, waic_2)
+```
 
 ## Summary
 
-- We have now seen a number of different types of hierarchical GLM
+- We have now seen a number of different types of hierarchical GLM in rstan
 - Many of the ideas of hierarchical linear models transfer over, but we can explore richer behaviour with hierarchical GLMs
 - These have all used the normal, binomial or Poisson distribution at the top level, and have allowed for over-dispersion, robustness, and ordinal data, to name just three
 

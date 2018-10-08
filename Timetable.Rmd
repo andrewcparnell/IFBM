@@ -72,7 +72,7 @@ Time  | Class
 ------------- | ----------------------------------------------------
 9:30-10:30 | Variable selection and non-parametrics  [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/class_13_varsel.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/class_13_varsel_handout.pdf)
 10:30-10:45 | Coffee break
-10:45-11:45 | Time series models and change-point analysis [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/class_14_ts_cp.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/class_14_ts_cp_handout.pdf)
+10:45-11:45 | Time series models [(slides)](https://rawgit.com/andrewcparnell/IFBM/master/slides/class_14_ts.pdf) [(handout)](https://rawgit.com/andrewcparnell/IFBM/master/slides/class_14_ts_handout.pdf)
 11:45-12:00 | Break
 12:00-12:45 | Bring your own data session 1 
 12:45-13:45 | Lunch

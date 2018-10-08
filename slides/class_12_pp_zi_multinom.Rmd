@@ -26,10 +26,6 @@ options(mc.cores = parallel::detectCores())
 - Be able to fit some basic zero inflation and hurdle models
 - Be able to understand and fit some multinomial modelling examples
 
-\vspace{2cm}
-
-- For this lecture we are going to switch to Stan
-
 ## A false dichotomy: fixed vs random effects
 
 - We've been fitting a model with varying intercepts and slopes to the earnings data:
@@ -61,7 +57,7 @@ wf = read.csv('../data/whitefly.csv')
 head(wf)
 ```
 
-The response variable here is the count `imm` of immature whiteflies, and the explanatory variables are `block` (plant number), `week`, and  treatment `treat`.
+The response variable here is the count `imm` of immature whiteflies, and the explanatory variables are `block` (plant number), `week`, and treatment `treat`.
 
 ## Look at those zeros!
 
@@ -151,9 +147,8 @@ $$p(y|\lambda) = \left\{ \begin{array}{ll} q_0 + (1-q_0) \times Poisson(0, \lamb
 
 ## Fitting models with custom probability distributions
 
-- The Zero-inflated Poisson distribution is not included in Stan or JAGS by default. We have to create it
+- The Zero-inflated Poisson distribution is not included in Stan by default. We have to create it
 - It's pretty easy to create new probability distributions in Stan
-- It's quite hard to do so in JAGS, requiring some weird tricks
 - In Stan all of you have to do is give it a way of computing the likelihood score, which it keeps track of via a variable called `target`
 
 ## Fitting the ZIP in Stan
@@ -452,7 +447,7 @@ model {
 ## Notes about this model
 
 - This model is not going to fit very well, since it is unlikely that a linear relationship between the covariates and the pollen counts will match the data
-- It might be better to use e.g. a spline model (not covered in this course, but we can talk about it)
+- It might be better to use e.g. a spline model (see later class)
 - Similarly we might need some complex interactions between the covariates as they are strongly linked
 - We have constrained the parameters here so that the slopes and intercepts borrow strength across species. Does this make sense? What else could we do?
 
@@ -460,7 +455,7 @@ model {
 
 - These models can be a pain to deal with as there are tricky constraints on the $\theta$ parameters to make them all sum to 1. 
 - The `softmax` function is one choice but there are lots of others (logistic ratios, the Dirichlet distribution, ...)
-- Whilst the classification version of this model just has binary $y_i$ (with just a single 1 in it) most packages (including JAGS and Stan) have a special distribution (e.g. `dcat` in JAGS) for this situation
+- Whilst the classification version of this model just has binary $y_i$ (with just a single 1 in it) most packages (including Stan) have a special distribution for this situation
 
 ## Summary
 
