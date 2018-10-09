@@ -36,7 +36,7 @@ Time  | Class
 12:45-13:45 | Lunch
 13:45-15:00 | Running Mixed Models in lme4 [(code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/tutor_2_lme4.R)
 15:00-15:30 | Coffee break
-15:30-17:00 | Exercises in lme4 [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_2_lme4.pdf)
+15:30-17:00 | Exercises in lme4 [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/practical_2_lme4.pdf)
 
 ## Wednesday 10th October - Mixed models and rstanarm
 
@@ -50,7 +50,7 @@ Time  | Class
 12:45-13:45 | Lunch
 13:45-15:00 | Running hierarchical models in rstanarm [(code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/tutor_3_rstanarm.R)
 15:00-15:30 | Coffee break
-15:30-17:00 | Exercises in rstanarm [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_3_rstanarm.pdf)
+15:30-17:00 | Exercises in rstanarm [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/practical_3_rstanarm.pdf)
 
 ## Thursday 11th October - Advanced mixed models with rstan
 
@@ -64,7 +64,7 @@ Time  | Class
 12:45-13:45 | Lunch
 13:45-15:00 | Creating your own models in rstan [(code)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/tutor_4_rstan.R)
 14:30-15:00 | Coffee break
-15:30-17:00 | Running advanced models in rstan [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/prac_4_rstan.pdf)
+15:30-17:00 | Running advanced models in rstan [(worksheet)](https://rawgit.com/andrewcparnell/IFBM/master/practicals/practical_4_rstan.pdf)
 
 ## Friday 12th October - Advanced topics and extensions
 
