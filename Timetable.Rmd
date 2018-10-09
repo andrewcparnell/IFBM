@@ -1,5 +1,5 @@
 ---
-title: 'Intro to Frequentist and Bayesian mixed models course'
+title: 'Introduction to Frequentist and Bayesian mixed models course'
 author: "Andrew Parnell"
 date: "October 2018"
 output:
