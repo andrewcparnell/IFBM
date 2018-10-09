@@ -24,7 +24,7 @@ options(mc.cores = parallel::detectCores())
 
 - Be able to specify complex prior distributions
 - Understand the difference between shrinkage and variable selection
-- Be able to fit shrinkage and selection models in JAGS/Stan
+- Be able to fit shrinkage and selection models in Stan
 - Be able to fit some non-parametric Bayesian models
 
 ## Some general lessons from the course
@@ -35,9 +35,10 @@ options(mc.cores = parallel::detectCores())
 
     1. Start with a simple, even stupid model
     1. Optionally simulate from it to define reasonable priors
-    1. Fit the model in Stan or JAGS
-    1. Get the DIC and perhaps a posterior predictive plot
+    1. Fit the model in `rstan` or `rstanarm`
+    1. Get the WAIC/LOO and create a posterior predictive plot
     1. Try enriching the model by adding layers/variables
+    1. Repeat from step 2!
 
 ## Really clever prior distributions
 
@@ -60,7 +61,7 @@ This is the Prostate data, taken from _Elements of Statistical Learning_ by Hast
 
 \tiny
 ```{r, echo = FALSE}
-prostate = read.csv('../data/prostate.csv')
+prostate = read.csv('data/prostate.csv')
 head(prostate)
 ```
 
@@ -87,6 +88,8 @@ $$\beta_j \sim N(0, \sigma_b^2), \mbox{for } j=1,\ldots,p$$
 - We can learn about $\sigma_b$ too by including a prior distribution on it
 
 - We always must _standardise the covariates_ when running a variable selection model otherwise these priors make no sense
+
+- This is creating a random effect by borrowing strength across covariates rather than across observations
 
 ## Ridge regression applied to the prostate data
 
@@ -133,6 +136,7 @@ stan_run = stan(data = list(N = nrow(prostate),
 ## Stan output
 
 ```{r, message=FALSE}
+stop()
 stan_hist(stan_run, pars = c('beta','sigma_b'), bins = 30)
 ```
 
@@ -189,7 +193,7 @@ stan_hist(stan_run, pars = c('beta','sigma_b'), bins = 30)
 
 ## Comparing ridge and lasso
 
-```{r, message = FALSE}
+```{r, message = FALSE, fig.height = 5}
 library(rmutil)
 curve(dlaplace, from = -4, to = 4, col = 'red', ylab = '')
 curve(dnorm, from = -4, to = 4, add = TRUE)
@@ -206,7 +210,7 @@ where $Cauchy^+$ are the half-Cauchy distributions we have been using already
 
 - The name comes from the plot of the shrinkage behaviour which looks a bit like a horseshoe
 
-- The plot of the density looks even more spiked than that of the Lasso
+- The plot of the density looks even more spiked than that of the Lasso (though possibly due to poor convergence)
 
 ```{r, include=FALSE}
 stan_code = '
@@ -254,7 +258,7 @@ stan_hist(stan_run, pars = c('beta','sigma','tau'), bins = 30)
 
 ## Final notes on Shrinkage
 
-- If we're most concerned with predictive performance we can judge these using cross-validation, or compare them using DIC (or WAIC with Stan)
+- If we're concerned with predictive performance we can assess these via cross-validation, or compare them using WAIC/LOO
 
 - The prostate data set has a column containing a training/test split so we could compare by fitting to the training and looking at performance on the test
 
@@ -271,44 +275,7 @@ $$\beta_j = I_j \gamma_j, I_j \sim Binom(1, q_j), \gamma_j \sim N(0, \sigma_b)$$
 
 - $q_j$ is the probability of variable $j$ being in the model. Often $q_j \sim U(0,1)$ but more informative priors can be used
 
-- Unfortunately you cannot fit this model in Stan, as it does not allow for discrete parameters $I_j$. You can fit it in JAGS though!
-
-## Spike and slab example
-
-```{r, message = FALSE}
-library(R2jags)
-jags_code = '
-model{
-  for (i in 1:N) {
-    y[i] ~ dnorm(alpha + inprod(X[i,], beta), sigma^-2)
-  }
-  for (j in 1:p) {
-    beta[j] <- I[j] * gamma[j]
-    I[j] ~ dbin(q[j], 1)
-    q[j] ~ dunif(0, 1)
-    gamma[j] ~ dnorm(0, 10^-2)
-  }
-  alpha ~ dnorm(0, 10^-2)
-  sigma ~ dt(0, 10, 1)T(0,)
-}
-'
-```
-
-```{r, include=FALSE}
-jags_run = jags(data = list(N = nrow(prostate), 
-                            p = ncol(X_std),
-                            y = prostate$lpsa,
-                            X = X_std),
-                parameters.to.save = 'I',
-                model.file = textConnection(jags_code))
-```
-
-## Output
-
-\tiny
-```{r}
-print(jags_run)
-```
+- Unfortunately you cannot fit this model in Stan, as it does not allow for discrete parameters $I_j$.
 
 ## Some notes on spike and slab
 
@@ -329,7 +296,7 @@ print(jags_run)
 - A common alternative to standard linear regression is to use polynomial regression:
 $$y_i \sim N(\beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \ldots + \beta_p x_i^p, \sigma^2)$$
 
-- This is simple to fit in JAGS/Stan using much of the code we have already seen
+- This is simple to fit in Stan using much of the code we have already seen
 
 - However, when $p$ is large this becomes very unwieldy, numerically unstable, hard to converge, and has some odd properties
 
@@ -578,7 +545,3 @@ lines(earnings3$height_cm, pred, col = 'red')
 - We have covered the ridge, lasso, and horseshoe methods
 - We have met some ways of running non-parametric regression models, including P-splines and Gaussian processes
 - There is much more to be said on these methods, but they will not be relevant to everyone here
-
-\vspace{1cm}
-
-- Good luck using Bayesian models in your research!
