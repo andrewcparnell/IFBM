@@ -30,7 +30,7 @@ library(lme4)
 ## Reminder: earnings data
 
 ```{r, echo = FALSE}
-dat = read.csv('../data/earnings.csv')
+dat = read.csv('data/earnings.csv')
 eth_names = c('Blacks','Hispanics','Whites','Others')
 with(dat, plot(x_centered, y, xlab = 'Height (centered)',
      ylab = 'log(Earnings)', type = 'n'))
@@ -59,7 +59,7 @@ summary(mm_1)
 
 \tiny
 ```{r}
-mm_2 = lmer(y ~ (x_centered | eth), data = dat, 
+mm_2 = lmer(y ~ x_centered + (x_centered | eth), data = dat, 
             control = lmerControl(optimizer = "Nelder_Mead"))
 summary(mm_2)
 ```
@@ -215,7 +215,9 @@ $$y_{ijk} = \alpha_j + \gamma_k + \delta x_{ijk} + \epsilon_{ijk}$$
 
 - This model has common slope but random intercepts for age group and ethnic group
 
-- We have the extra constraints $\alpha_j \sim N(\mu_\alpha, \sigma_\alpha^2)$, $\gamma_k \sim N(\mu_\gamma, \sigma_\gamma^2)$, $\epsilon_{ijk} \sim N(0, \sigma^2)$
+- We have the extra constraints $\alpha_j \sim N(\mu_\alpha, \sigma_\alpha^2)$, $\gamma_k \sim N(0, \sigma_\gamma^2)$, $\epsilon_{ijk} \sim N(0, \sigma^2)$
+
+- (Q: Why is the mean of $\gamma_k$ set to zero?)
 
 ## Summary
 

@@ -76,9 +76,13 @@ airquality[21,] # Has an Ozone value of 1!
 AIC(mod_2) #173.1773
 mod_3 = lm(log(Ozone) ~ .*. , data = airquality) # All 2-way interactions
 AIC(mod_3) #187.0112
-mod_4 = lm(log(Ozone) ~ .^3 , data = airquality) # All 2-way interactions
+mod_4 = lm(log(Ozone) ~ .^3 , data = airquality) # All 3-way interactions
 AIC(mod_4) #183.7287
-# Didn't find anything better than first model
+mod_5 = lm(log(Ozone) ~ . + Wind:Temp , data = airquality)
+AIC(mod_5) # 170.3261
+mod_6 = lm(log(Ozone) ~ . + I(Wind^2), data = airquality)
+AIC(mod_6) # 167.5134
+# Slight improvement
 ```
 
 ## Task set 2: logistic regression
@@ -93,7 +97,7 @@ AIC(mod_4) #183.7287
 
 1. Fit a binomial glm (a logistic regression) with the binary variable as the response and `width` as a covariate. Summarise your findings
 
-1. Create a plot of the fitted values on top of a scatter plot of the data (hint: width on x-axis, binary response variable on y-axis)
+1. Create a plot of the fitted values on top of a scatter plot of the data (hint: `width` on x-axis, binary response variable on y-axis)
 
 1. Try fitting some more models to the data with more variables (and perhaps interactions) to see if you can get the AIC lower. Compare your new models' fitted values to the first model
 
@@ -116,7 +120,8 @@ pairs(horseshoe)
 # 4
 horseshoe$satell_bin = as.integer(horseshoe$satell>0)
 # 5
-mod = glm(satell_bin ~ width, family = binomial(link = logit),
+mod = glm(satell_bin ~ width, 
+          family = binomial(link = logit),
           data = horseshoe)
 summary(mod) # Have enough data to observe an effect
 # 6
@@ -132,6 +137,9 @@ AIC(mod_2) # 200.0279
 mod_3 = glm(satell_bin ~ width*weight*color_fac, family = binomial(link = logit),
           data = horseshoe)
 AIC(mod_3) # 202.6617
+mod_4 = glm(satell_bin ~ width+color_fac, family = binomial(link = logit),
+          data = horseshoe)
+AIC(mod_4) # 197.457
 ```
 
 ## Task set 3: Poisson and Negative Binomial regression

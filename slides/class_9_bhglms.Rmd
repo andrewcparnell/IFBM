@@ -30,7 +30,28 @@ library(bayesplot)
 - Within this framework, we can borrow the ideas from the previous class to create hierarchical GLMs
 - We will go through four examples: binomial-logit, Poisson, robust regression, and ordinal regression 
 
-## Example 1: binomial-logit
+## Example 1: earnings data (again!)
+
+- Very easy to convert quickly from `lmer` to `stan_lmer`:
+
+\tiny
+```{r, warning=FALSE, message = FALSE, results = 'hide'}
+dat = read.csv('data/earnings.csv')
+mod_1 = stan_lmer(y ~ x_centered + (x_centered | eth), data = dat)
+```
+```{r}
+round(posterior_interval(mod_1), 3)
+```
+
+## Earnings model output
+
+```{r}
+plot(mod_1)
+```
+
+
+
+## Example 2: binomial-logit
 
 - Earlier we met the Binomial-logit model for binary data:
 $$y_i \sim Bin(1, p_i), logit(p_i) = \alpha + \beta (x_i - \bar{x})$$
@@ -76,9 +97,8 @@ swt$y = apply(swt[,1:3],1,sum_fun)[1,]
 swt$N = apply(swt[,1:3],1,sum_fun)[2,]
 ```
 
-\tiny
 ```{r, message = FALSE, warning = FALSE, results = 'hide'}
-mod_1 = stan_glmer(cbind(y, N) ~  (forest | alt),
+mod_2 = stan_glmer(cbind(y, N) ~ forest + (forest | alt),
                   data = swt,
                   family = binomial(link = 'logit'),
                   prior = normal(0, 0.1),
@@ -89,33 +109,33 @@ mod_1 = stan_glmer(cbind(y, N) ~  (forest | alt),
 
 \tiny
 ```{r}
-round(as.data.frame(summary(mod_1)), 2)
+posterior_interval(mod_2)
 ```
 
 ## Model summary 2
 
 ```{r}
-plot(mod_1)
+plot(mod_2)
 ```
 
 ## Model fit - intercepts
 
 ```{r, echo = FALSE, message=FALSE, results = 'hide'}
-mcmc_hist(as.data.frame(mod_1), regex_pars = 'b\\[\\(Intercept',
+mcmc_hist(as.data.frame(mod_2), regex_pars = 'b\\[\\(Intercept',
           facet_args = list(nrow = 3))
 ```
 
 ## Model fit - Slopes
 
 ```{r, echo = FALSE, message=FALSE, results = 'hide'}
-mcmc_hist(as.data.frame(mod_1), regex_pars = 'b\\[forest')
+mcmc_hist(as.data.frame(mod_2), regex_pars = 'b\\[forest')
 ```
 
 
 ## Model fit - posterior predictive check
 
 ```{r, fig.height = 5}
-y_rep = posterior_predict(mod_1)
+y_rep = posterior_predict(mod_2)
 y_rep_mean = apply(y_rep, 2, 'mean')
 plot(swt$y, y_rep_mean)
 abline(a = 0, b = 1, col = 'red')
@@ -124,7 +144,7 @@ abline(a = 0, b = 1, col = 'red')
 ## Model fit - posterior predictive check 2
 
 ```{r, echo=FALSE}
-pp_check(mod_1)
+pp_check(mod_2)
 ```
 
 ## Type 2: Poisson HGLMs
@@ -154,15 +174,15 @@ where $\sigma$ is the over-dispersion parameter
 
 ```{r, message = FALSE, results = 'hide', warning=FALSE, fig.height = 5}
 swt$obs <- 1:nrow(swt)
-mod_2 = stan_glmer(y ~ forest + (1 | obs),
+mod_3 = stan_glmer(y ~ forest + (1 | obs),
               family = poisson, data = swt)
-mcmc_hist(as.data.frame(mod_2), regex_pars = 'forest')
+mcmc_hist(as.data.frame(mod_3), regex_pars = 'forest')
 ```
 
 ## Posterior predictive check
 
 ```{r}
-pp_check(mod_2)
+pp_check(mod_3)
 ```
 
 ## Notes about OD Poisson model
@@ -217,7 +237,7 @@ plot(x, z, col = y + 1)
 ## Fitting in `rstanarm`
 
 ```{r, message=FALSE, results = 'hide', warnings = FALSE}
-mod_3 <- stan_polr(y ~ x, 
+mod_4 <- stan_polr(y ~ x, 
                    data = dat,
                    prior = R2(0.25, 'mean'), 
                    prior_counts = dirichlet(1))
@@ -227,7 +247,7 @@ mod_3 <- stan_polr(y ~ x,
 
 \small
 ```{r, fig.height = 5}
-mcmc_hist(as.data.frame(mod_3))
+mcmc_hist(as.data.frame(mod_4))
 ```
 
 ## Summary
