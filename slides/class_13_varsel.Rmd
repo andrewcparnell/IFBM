@@ -6,6 +6,8 @@ output:
   beamer_presentation:
     includes:
       in_header: header.tex
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -17,7 +19,7 @@ set.seed(123)
 par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
 library(rstan)
 rstan_options(auto_write = TRUE)
-options(mc.cores = parallel::detectCores())
+#options(mc.cores = parallel::detectCores())
 ```
 
 ## Learning outcomes:
@@ -61,7 +63,7 @@ This is the Prostate data, taken from _Elements of Statistical Learning_ by Hast
 
 \tiny
 ```{r, echo = FALSE}
-prostate = read.csv('data/prostate.csv')
+prostate = read.csv('../data/prostate.csv')
 head(prostate)
 ```
 
@@ -136,8 +138,7 @@ stan_run = stan(data = list(N = nrow(prostate),
 ## Stan output
 
 ```{r, message=FALSE}
-stop()
-stan_hist(stan_run, pars = c('beta','sigma_b'), bins = 30)
+plot(stan_run, pars = c('beta','sigma_b'))
 ```
 
 ## Lasso 
@@ -188,7 +189,7 @@ stan_run = stan(data = list(N = nrow(prostate),
 ## Stan output
 
 ```{r, message=FALSE}
-stan_hist(stan_run, pars = c('beta','sigma_b'), bins = 30)
+plot(stan_run, pars = c('beta','sigma_b'))
 ```
 
 ## Comparing ridge and lasso
@@ -252,7 +253,7 @@ stan_run = stan(data = list(N = nrow(prostate),
 ## Stan output
 
 ```{r, message=FALSE}
-stan_hist(stan_run, pars = c('beta','sigma','tau'), bins = 30)
+plot(stan_run, pars = c('beta','sigma','tau'))
 ```
 
 
