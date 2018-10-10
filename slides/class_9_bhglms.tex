@@ -1,0 +1,581 @@
+\documentclass[ignorenonframetext,]{beamer}
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{: }
+\setbeamercolor{caption name}{fg=normal text.fg}
+\beamertemplatenavigationsymbolsempty
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\newif\ifbibliography
+\hypersetup{
+            pdftitle={Class 9: Bayesian Hierarchical Models},
+            pdfauthor={Andrew Parnell},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight0.8\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+
+% Prevent slide breaks in the middle of a paragraph:
+\widowpenalties 1 10000
+\raggedbottom
+
+\AtBeginPart{
+  \let\insertpartnumber\relax
+  \let\partname\relax
+  \frame{\partpage}
+}
+\AtBeginSection{
+  \ifbibliography
+  \else
+    \let\insertsectionnumber\relax
+    \let\sectionname\relax
+    \frame{\sectionpage}
+  \fi
+}
+\AtBeginSubsection{
+  \let\insertsubsectionnumber\relax
+  \let\subsectionname\relax
+  \frame{\subsectionpage}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+\usepackage{graphicx}
+\usepackage{amsmath,amsfonts,amssymb,amsthm,amscd, mathrsfs}
+\setbeamertemplate{navigation symbols}{} %%removes bottom line
+\setbeamertemplate{footline}[frame number]
+
+\title{Class 9: Bayesian Hierarchical Models}
+\author{Andrew Parnell\newline \texttt{andrew.parnell@mu.ie}
+\newline \vspace{1cm} \newline \includegraphics[width=5cm]{MU_logo.jpg}}
+\date{}
+
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}[fragile]{Learning outcomes:}
+
+\begin{itemize}
+\tightlist
+\item
+  Start fitting hierarchical GLMs in \texttt{rstanarm}
+\item
+  Know some of the different versions of Hierarchical GLMs
+\item
+  Be able to expand and summarise fitted models
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{From LMs to HGLMs}
+
+\begin{itemize}
+\tightlist
+\item
+  The Bayesian analogue of a mixed model is a \emph{hierarchical model}.
+\item
+  It's called a hierarchical model because the prior distributions come
+  in layers, they depend on other parameters
+\item
+  Within this framework, we can borrow the ideas from the previous class
+  to create hierarchical GLMs
+\item
+  We will go through four examples: binomial-logit, Poisson, robust
+  regression, and ordinal regression
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Example 1: earnings data (again!)}
+
+\begin{itemize}
+\tightlist
+\item
+  Very easy to convert quickly from \texttt{lmer} to
+  \texttt{stan\_lmer}:
+\end{itemize}
+
+\tiny
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat =}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'data/earnings.csv'}\NormalTok{)}
+\NormalTok{mod_}\DecValTok{1}\NormalTok{ =}\StringTok{ }\KeywordTok{stan_lmer}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{x_centered }\OperatorTok{+}\StringTok{ }\NormalTok{(x_centered }\OperatorTok{|}\StringTok{ }\NormalTok{eth), }\DataTypeTok{data =}\NormalTok{ dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{round}\NormalTok{(}\KeywordTok{posterior_interval}\NormalTok{(mod_}\DecValTok{1}\NormalTok{), }\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                        5%   95%
+## (Intercept)                         9.636 9.782
+## x_centered                         -0.009 0.031
+## b[(Intercept) eth:1]               -0.081 0.040
+## b[x_centered eth:1]                -0.025 0.016
+## b[(Intercept) eth:2]               -0.105 0.040
+## b[x_centered eth:2]                -0.022 0.022
+## b[(Intercept) eth:3]               -0.025 0.107
+## b[x_centered eth:3]                -0.005 0.035
+## b[(Intercept) eth:4]               -0.068 0.075
+## b[x_centered eth:4]                -0.033 0.017
+## sigma                               0.873 0.938
+## Sigma[eth:(Intercept),(Intercept)]  0.000 0.016
+## Sigma[eth:x_centered,(Intercept)]  -0.001 0.002
+## Sigma[eth:x_centered,x_centered]    0.000 0.002
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Earnings model output}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(mod_}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-3-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Example 2: binomial-logit}
+
+\begin{itemize}
+\item
+  Earlier we met the Binomial-logit model for binary data:
+  \[y_i \sim Bin(1, p_i), logit(p_i) = \alpha + \beta (x_i - \bar{x})\]
+  Here \(logit(p_i)\) is the link function equal to
+  \(\log \left( \frac{p_i}{1-p_i} \right)\) and transforms the bounded
+  probabilities into an unbounded space
+\item
+  If we have non-binary data we just change the likelihood:
+  \[y_i \sim Bin(N_i, p_i), logit(p_i) = \alpha + \beta (x_i - \bar{x})\]
+\item
+  In a hierarchical version of this model, we vary the \emph{latent
+  parameters} \(\alpha\) and \(\beta\) and give them prior distributions
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{The swiss willow tit data}
+
+\tiny
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{swt =}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'data/swt.csv'}\NormalTok{)}
+\KeywordTok{head}\NormalTok{(swt)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   rep.1 rep.2 rep.3 c.2 c.3 elev forest dur.1 day.2 day.3 length alt
+## 1     0     0     0   0   0  420      3   240    58    73    6.2 Low
+## 2     0     0     0   0   0  450     21   160    39    62    5.1 Low
+## 3     0     0     0   0   0 1050     32   120    47    74    4.3 Med
+## 4     0     0     0   0   0 1110     35   180    44    71    5.4 Med
+## 5     0     0     0   0   0  510      2   210    56    73    3.6 Low
+## 6     0     0     0   0   0  630     60   150    56    73    6.1 Low
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{A hierarchical model}
+
+\small
+- Suppose we want to fit a model on the sum \(y_i =\)
+\texttt{rep.1\ +\ rep.2\ +\ rep.3}:
+\[y_i \sim Bin(N_i, p_i), logit(p_i) = \alpha_{\mbox{altitude}_i} + \beta_{\mbox{altitude}_i} (x_i- \bar{x})\]
+where \(x_i\) is the percentage of forest cover
+
+\begin{itemize}
+\item
+  What prior distributions should we use for \(\alpha\) and \(\beta\)?
+\item
+  Useful side note: A value of 10 on the logit scale leads to a
+  probability of about 1, and a value of -10 leads to a probability of
+  about 0 (you can test this by typing \texttt{inv.logit(10)}) so I
+  wouldn't expect the value of \(logit(p_i)\) to ever get much bigger
+  than 10 or smaller than -10
+\item
+  I have no idea whether we are more likely to find these birds in high
+  percentage forest or low, so I'm happy to think that \(\beta\) might
+  be around zero, and be positive or negative. Forest cover ranges from
+  0 to 100 so that suggests that \(\beta\) is every likely to be bigger
+  than 0.1 or smaller than -0.1. Perhaps \(\beta \sim N(0, 0.1^2)\) is a
+  good prior
+\item
+  It looks to me like the intercept is very unlikely to be outside the
+  range (-10, 10) so perhaps \(\alpha \sim N(0, 5^2)\) is appropriate
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{rstanarm} code}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mod_}\DecValTok{2}\NormalTok{ =}\StringTok{ }\KeywordTok{stan_glmer}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(y, N) }\OperatorTok{~}\StringTok{ }\NormalTok{forest }\OperatorTok{+}\StringTok{ }\NormalTok{(forest }\OperatorTok{|}\StringTok{ }\NormalTok{alt),}
+                  \DataTypeTok{data =}\NormalTok{ swt,}
+                  \DataTypeTok{family =} \KeywordTok{binomial}\NormalTok{(}\DataTypeTok{link =} \StringTok{'logit'}\NormalTok{),}
+                  \DataTypeTok{prior =} \KeywordTok{normal}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.1}\NormalTok{),}
+                  \DataTypeTok{prior_intercept =} \KeywordTok{normal}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\end{frame}
+
+\begin{frame}[fragile]{Model summary 1}
+
+\tiny
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{posterior_interval}\NormalTok{(mod_}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                               5%          95%
+## (Intercept)                        -2.9716628359 -1.410061400
+## forest                             -0.0053591880  0.006660342
+## b[(Intercept) alt:High]            -0.1546953851  1.393642353
+## b[forest alt:High]                  0.0132429998  0.033927229
+## b[(Intercept) alt:Low]             -1.8313389184  0.011825971
+## b[forest alt:Low]                  -0.0278474865  0.015678492
+## b[(Intercept) alt:Med]             -0.4328987953  1.192305997
+## b[forest alt:Med]                   0.0024746665  0.024134954
+## Sigma[alt:(Intercept),(Intercept)]  0.0033074897  2.987954932
+## Sigma[alt:forest,(Intercept)]      -0.0316645266  0.056452610
+## Sigma[alt:forest,forest]            0.0001374629  0.025760649
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Model summary 2}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(mod_}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-8-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Model fit - intercepts}
+
+\includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-9-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Model fit - Slopes}
+
+\includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-10-1.pdf}
+
+\end{frame}
+
+\begin{frame}[fragile]{Model fit - posterior predictive check}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{y_rep =}\StringTok{ }\KeywordTok{posterior_predict}\NormalTok{(mod_}\DecValTok{2}\NormalTok{)}
+\NormalTok{y_rep_mean =}\StringTok{ }\KeywordTok{apply}\NormalTok{(y_rep, }\DecValTok{2}\NormalTok{, }\StringTok{'mean'}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(swt}\OperatorTok{$}\NormalTok{y, y_rep_mean)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{a =} \DecValTok{0}\NormalTok{, }\DataTypeTok{b =} \DecValTok{1}\NormalTok{, }\DataTypeTok{col =} \StringTok{'red'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-11-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Model fit - posterior predictive check 2}
+
+\includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-12-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Type 2: Poisson HGLMs}
+
+\begin{itemize}
+\item
+  For a Poisson distribution there is no upper bound on the number of
+  counts
+\item
+  We just change the likelihood (to Poisson) and the link function (to
+  \(\log\)):
+  \[y_i \sim Po(\lambda_i), \log(\lambda_i) = \alpha + \beta (x_i - \bar{x}))\]
+\item
+  We can now add our hierarchical layers into \(\alpha\) and \(\beta\),
+  or\ldots{}
+\item
+  Another way we can add an extra layer is by giving \(\log(\lambda_i)\)
+  a probability distribution rather than setting it to a value
+\item
+  This is a way of introducing \emph{over-dispersion}, i.e.~saying that
+  the data are more variable than that expected by a standard Poisson
+  distribution with our existing covariates
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{An over-dispersed model}
+
+\begin{itemize}
+\item
+  The over-dispersed model looks like:
+  \[y_i \sim Po(\lambda_i), \log(\lambda_i) \sim N(\alpha + \beta (x_i - \bar{x}), \sigma^2)\]
+  where \(\sigma\) is the over-dispersion parameter
+\item
+  We now need to estimate prior distributions for \(\alpha\), \(\beta\),
+  and \(\sigma\)
+\item
+  We will use the SWT data again, but pretend that we didn't know that
+  they had gone out \(N\) times looking for the birds
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{rstanarm} code for OD Poisson}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{swt}\OperatorTok{$}\NormalTok{obs <-}\StringTok{ }\DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(swt)}
+\NormalTok{mod_}\DecValTok{3}\NormalTok{ =}\StringTok{ }\KeywordTok{stan_glmer}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{forest }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1} \OperatorTok{|}\StringTok{ }\NormalTok{obs),}
+              \DataTypeTok{family =}\NormalTok{ poisson, }\DataTypeTok{data =}\NormalTok{ swt)}
+\KeywordTok{mcmc_hist}\NormalTok{(}\KeywordTok{as.data.frame}\NormalTok{(mod_}\DecValTok{3}\NormalTok{), }\DataTypeTok{regex_pars =} \StringTok{'forest'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-13-1.pdf}
+
+\end{frame}
+
+\begin{frame}[fragile]{Posterior predictive check}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{pp_check}\NormalTok{(mod_}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-14-1.pdf}
+
+\end{frame}
+
+\begin{frame}[fragile]{Notes about OD Poisson model}
+
+\begin{itemize}
+\item
+  The way to think about OD models is via the data generating process.
+  Draw a DAG and think about how these processes might arise
+\item
+  We could compare this model to one without over dispersion via the PPC
+  (or if time, cross validation).
+\item
+  In general, the parameter values (i.e.~the intercepts and slopes) tend
+  to be more uncertain when you add in over dispersion
+\item
+  Also in the data set is a variable called \texttt{dur} which
+  represents how long they spent looking for the birds. This could be
+  added in as an offset via the likelihood
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Type 4: Ordinal data HGLMs}
+
+\begin{itemize}
+\tightlist
+\item
+  Often we have a response variable which is ordinal, e.g.~disagree,
+  neutral, agree, etc
+\item
+  There are lots of different (and complicated) ways to model such data
+\item
+  Perhaps the easiest is to think of it as a hierarchical model with
+  `cut-points' on a latent linear regression
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{An ordinal model example}
+
+\begin{itemize}
+\tightlist
+\item
+  Suppose \(y_i = \{\mbox{disagree, neutral, agree} \}\) and we make it
+  dependent on a latent continuous variable \(z_i\), so that :
+\end{itemize}
+
+\[y_i = \left\{ \begin{array}{ll} \mbox{agree} & \mbox{if } z_i> 0.5 \\
+\mbox{neutral} & \mbox{if } -0.5 < z_i \le 0.5 \\
+\mbox{disagree} & \mbox{if } z_i \le -0.5 \end{array} \right.\]
+
+\begin{itemize}
+\tightlist
+\item
+  We then give \(z_i\) a prior distribution, e.g.
+  \(N(\beta_0 + \beta_1 x_i, \sigma^2)\)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Simulating some example data}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{N =}\StringTok{ }\DecValTok{100}
+\NormalTok{alpha =}\StringTok{ }\OperatorTok{-}\DecValTok{1}
+\NormalTok{beta =}\StringTok{ }\FloatTok{0.2}
+\NormalTok{sigma =}\StringTok{ }\FloatTok{0.51}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
+\NormalTok{x =}\StringTok{ }\KeywordTok{runif}\NormalTok{(N, }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{)}
+\NormalTok{cuts =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\OperatorTok{-}\FloatTok{0.5}\NormalTok{, }\FloatTok{0.5}\NormalTok{)}
+\NormalTok{z =}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(N, alpha }\OperatorTok{+}\StringTok{ }\NormalTok{beta }\OperatorTok{*}\StringTok{ }\NormalTok{(x }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(x)), sigma)}
+\NormalTok{y =}\StringTok{ }\KeywordTok{findInterval}\NormalTok{(z, cuts)}
+\NormalTok{dat =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{y =} \KeywordTok{as.factor}\NormalTok{(y),}
+                 \DataTypeTok{x =}\NormalTok{ x)}
+\end{Highlighting}
+\end{Shaded}
+
+\end{frame}
+
+\begin{frame}[fragile]{Simulated data - plot}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(x, z, }\DataTypeTok{col =}\NormalTok{ y }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-16-1.pdf}
+
+\end{frame}
+
+\begin{frame}[fragile]{Fitting in \texttt{rstanarm}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mod_}\DecValTok{4}\NormalTok{ =}\StringTok{ }\KeywordTok{stan_polr}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{x, }
+                   \DataTypeTok{data =}\NormalTok{ dat,}
+                   \DataTypeTok{prior =} \KeywordTok{R2}\NormalTok{(}\FloatTok{0.5}\NormalTok{, }\StringTok{"mean"}\NormalTok{),}
+                   \DataTypeTok{prior_counts =} \KeywordTok{dirichlet}\NormalTok{(}\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\end{frame}
+
+\begin{frame}[fragile]{Output}
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{mcmc_hist}\NormalTok{(}\KeywordTok{as.data.frame}\NormalTok{(mod_}\DecValTok{4}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+\end{verbatim}
+
+\includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-18-1.pdf}
+
+\end{frame}
+
+\begin{frame}{Summary}
+
+\begin{itemize}
+\tightlist
+\item
+  We have now seen a number of different types of hierarchical GLM
+\item
+  Many of the ideas of hierarchical linear models transfer over, but we
+  can explore richer behaviour with hierarchical GLMs
+\item
+  These have all used the normal, binomial or Poisson distribution at
+  the top level, and have allowed for over-dispersion, robustness, and
+  ordinal data, to name just three
+\end{itemize}
+
+\end{frame}
+
+\end{document}

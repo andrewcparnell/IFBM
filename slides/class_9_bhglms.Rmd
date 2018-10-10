@@ -66,7 +66,7 @@ $$y_i \sim Bin(N_i, p_i), logit(p_i) = \alpha + \beta (x_i - \bar{x})$$
 
 \tiny
 ```{r}
-swt = read.csv('../data/swt.csv')
+swt = read.csv('data/swt.csv')
 head(swt)
 ```
 
@@ -237,9 +237,9 @@ plot(x, z, col = y + 1)
 ## Fitting in `rstanarm`
 
 ```{r, message=FALSE, results = 'hide', warnings = FALSE}
-mod_4 <- stan_polr(y ~ x, 
+mod_4 = stan_polr(y ~ x, 
                    data = dat,
-                   prior = R2(0.25, 'mean'), 
+                   prior = R2(0.5, "mean"),
                    prior_counts = dirichlet(1))
 ```
 

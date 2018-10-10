@@ -169,7 +169,7 @@ To fit some glmms, we're going to partition the `MTCO` variable into 4 levels. W
 1. From yesterday, create a new variable `MTCO_cut` which is defined as: `cold_winter` if `MTCO` $\le$ -17, `mild_winter` if -17 $<$ `MTCO` $\le$ -8, `warm_winter` if -8 < `MTCO` $\le$ 0, and `hot_winter` if `MTCO` > 0. Hint: use the `cut` function. Create a table of `MTCO_cut` values; there should be a roughly equal number of observations in each group
 1. Fit some initial Poisson glmms, perhaps using the structure you might have learnt from the previous exercise (i.e. perhaps a non-linear relationship?). Check the fit of these models 
 1. Fit some Negative Binomial glmms. Note that to do this you have to use the `stan_glmer.nb` function which means you don't need a `family` command but otherwise all is the same. Does this improve the fit? Use the tools we have learnt to help decide which models are best. 
-***
+
 
 ```{r, include = FALSE, eval = FALSE}
 # 1
