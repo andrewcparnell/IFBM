@@ -283,7 +283,7 @@ Bayesian hierarchical modelling is a great way to stop using p-values and start 
 
 ## General tips
 
-- If you have lots of disparate data, try to build one model for all it. You'll be able to _borrow strength_ from the data (e.g. in a hierarchical model) and reduce the uncertainty in your parameter estimates
+- If you have lots of disparate data, try to build one model for all of it. You'll be able to _borrow strength_ from the data (e.g. in a hierarchical model) and reduce the uncertainty in your parameter estimates
 
 - Try your hardest to use informative priors, and always justify the values you use (especially when trying to publish). In this course we're presenting generic examples so have almost always used vague priors
 

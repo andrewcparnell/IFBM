@@ -134,7 +134,7 @@ $$\log(\mbox{earnings}) \sim N(\alpha + \beta_1 \mbox{height} + \beta_2 \mbox{wh
 Model code:
 \tiny
 ```{r, message=FALSE, warning=FALSE, results='hide'}
-earnings = read.csv('../data/earnings.csv')
+earnings = read.csv('data/earnings.csv')
 earnings$white = as.integer(earnings$eth == 3)
 mod_1 = stan_lm(y ~ x_centered + white, data = earnings,
                 prior = R2(location = 0.5, 'mean'))
@@ -343,7 +343,7 @@ pp_check(mod_2)
 Recall the Willow tit data:
 \tiny
 ```{r}
-swt = read.csv('../data/swt.csv')
+swt = read.csv('data/swt.csv')
 head(swt)
 ```
 \normalsize
@@ -398,6 +398,12 @@ points(swt$forest,
 - Just like the linear regression example, we can create posterior predictive distributions for the binary data from the binomial distribution
 - However, it isn't as easy to plot as the regression situation as all the true values are 0 and 1. 
 - Instead people often use _classification metrics_ which we do not cover in this course (but can discuss if required)
+
+## Posterior predictive check for Binomial data
+
+```{r, fig.height = 6}
+pp_check(mod_3)
+```
 
 ## Binomial modelling as latent data
 
