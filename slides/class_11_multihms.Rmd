@@ -169,7 +169,7 @@ par(mfrow=c(1,1))
 - Notice that a linear model implies:
 $$y_i = \alpha + \beta x_i + \epsilon_i$$
 whilst the log-linear model implies:
-$$y_i = \exp( \alpha + \beta x_i + \epsilon_i) = e^\alpha \times e^{\beta x_i} \times e^\epsilon_i$$
+$$y_i = \exp( \alpha + \beta x_i + \epsilon_i) = e^\alpha \times e^{\beta x_i} \times e^{\epsilon_i}$$
 so the coefficients, once exponentiated, have multiplicative effects
 that are relatively easy to interpret
 

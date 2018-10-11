@@ -159,11 +159,11 @@ data {
   int eth[N];
 }
 parameters {
-  real intercept[N_eth];
+  vector[N_eth] intercept;
   real slope;
   real mean_intercept;
   real<lower=0> residual_sd;
-  real<lower=0> sigma_slope;
+  real<lower=0> sigma_intercept;
 } 
 model {
   // Likelihood
@@ -173,10 +173,10 @@ model {
   // Priors
   slope ~ normal(0, 0.1);
   for (j in 1:N_eth) {
-    intercept[j] ~ normal(mean_intercept, sigma_slope);
+    intercept[j] ~ normal(mean_intercept, sigma_intercept);
   }
   mean_intercept ~ normal(11, 2);
-  sigma_slope ~ cauchy(0, 10);
+  sigma_intercept ~ cauchy(0, 10);
   residual_sd ~ cauchy(0, 10);
 }
 '
@@ -241,7 +241,7 @@ model {
 generated quantities {
   vector[N_pred] y_pred;
   for (j in 1:N_pred) 
-    y_pred[j] = intercept + slope * x[j];
+    y_pred[j] = intercept + slope * x_pred[j];
 }
 '
 ```
@@ -274,7 +274,6 @@ data {
   int N;
   vector[N] x;
   vector[N] y;
-  vector[N_pred] y_pred;
 }
 parameters {
   real intercept;
@@ -411,11 +410,14 @@ $$\mbox{WAIC}: - 2 \log L_{\mbox{max}} + p_{\mbox{WAIC}}$$
 
 ## Example: computing `loo` and `waic` on an `rstanarm` regression model
 
+\small
 ```{r, message = FALSE, warning=FALSE, results = 'hide'}
 library(loo)
 prostate = read.csv('../data/prostate.csv')
-mod_1 = stan_lmer(lpsa ~ lcavol+ ( 1| gleason), data = prostate)
-mod_2 = stan_lmer(lpsa ~ (lcavol | gleason), data = prostate)
+mod_1 = stan_lmer(lpsa ~ lcavol+ (1| gleason), 
+                  data = prostate)
+mod_2 = stan_lmer(lpsa ~ lcavol + (lcavol | gleason),
+                  data = prostate)
 ```
 
 ```{r, warning=FALSE}
@@ -426,6 +428,7 @@ compare_models(loo_1, loo_2)
 
 ## Now with WAIC
 
+\small 
 ```{r, warning=FALSE}
 library(loo)
 prostate = read.csv('../data/prostate.csv')
