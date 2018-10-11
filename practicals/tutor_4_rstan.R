@@ -2,7 +2,8 @@
 
 # Clear the workspace and call in packages
 rm(list = ls())
-library(rstanarm)
+setwd("~/GitHub/IFBM/practicals")
+library(rstan)
 library(bayesplot)
 library(loo)
 par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
@@ -147,7 +148,7 @@ model {
 generated quantities {
   vector[N_pred] y_pred;
   for (j in 1:N_pred) 
-    y_pred[j] = intercept + slope * x[j];
+    y_pred[j] = intercept + slope * x_pred[j];
 }
 '
 
@@ -157,7 +158,8 @@ stan_run_3 = stan(data = list(N = nrow(earnings),
                               y = earnings$y,
                               x = earnings$x_centered,
                               x_pred = seq(-3,3, length = 5)),
-                  model_code = stan_code_3)
+                  model_code = stan_code_3,
+                  control = list(adapt_delta = 0.9))
 
 ## Look at posterior
 preds = extract(stan_run_3, 'y_pred')
@@ -169,7 +171,6 @@ data {
   int N;
   vector[N] x;
   vector[N] y;
-  vector[N_pred] y_pred;
 }
 parameters {
   real intercept;
@@ -498,9 +499,10 @@ eth_names = c('Blacks','Hispanics','Whites','Others')
 par(mfrow=c(4,3))
 for(i in 1:4) {
   for(j in 1:3) {
-    curr_dat = subset(dat, dat$eth == i & dat$age == j)
+    curr_dat = subset(earnings, 
+                      earnings$eth == i & earnings$age == j)
     plot(curr_dat$height_cm, log(curr_dat$earn), main = paste(eth_names[i], age_grp_names[j]), ylab = 'log(earnings)', xlab = 'Height (cm)')
-    lines(dat$height_cm, intercept_means[i,j] + slope_means[i,j]*(dat$height_cm - mean (dat$height_cm)), col = i)    
+    lines(earnings$height_cm, intercept_means[i,j] + slope_means[i,j]*(earnings$height_cm - mean (earnings$height_cm)), col = i)    
   }
 }
 par(mfrow=c(1,1))
@@ -541,14 +543,16 @@ model {
 '
 
 ## Fit the model if you've got a while to wait!
-## stan_run_6 = stan(data = list(N = nrow(earnings),
-##                               y = earnings$y,
-##                               x = earnings$x_centered,
-##                               eth = earnings$eth,
-##                               age = earnings$age,
-##                               N_eth = length(unique(earnings$eth)),
-##                               N_age = length(unique(earnings$age))),
-##                 model_code = stan_code_6)
+stan_run_6 = stan(data = list(N = nrow(earnings),
+                              y = earnings$y,
+                              x = earnings$x_centered,
+                              eth = earnings$eth,
+                              age = earnings$age,
+                              N_eth = length(unique(earnings$eth)),
+                              N_age = length(unique(earnings$age))),
+                model_code = stan_code_6,
+                control = list(adapt_delta = 0.9))
+plot(stan_run_6)
 
 ## Demonstrate loo model
 stan_code_loo = '

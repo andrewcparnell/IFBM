@@ -1,5 +1,5 @@
 ---
-title: "Prerequisites for Intro to Frequentist and Bayesian mixed models course"
+title: "Prerequisites for Introdution to Frequentist and Bayesian mixed models course"
 author: "Andrew Parnell"
 output: html_document
 ---
@@ -16,9 +16,7 @@ Install theses packages by following the links
 
 -	Rstudio (optional but recommended): [www.rstudio.com](https://www.rstudio.com)
 
--	JAGS: [sourceforge.net/projects/mcmc-jags/files/](http://sourceforge.net/projects/mcmc-jags/files/)
-
-- If you're using Windows you also need to install the correct version of [Rtools](https://cran.r-project.org/bin/windows/Rtools/) to match your R version
+- If you're using Windows you also need to install the correct version of [Rtools](https://cran.r-project.org/bin/windows/Rtools/) to match your R version. Make sure you install the most recent 'frozen' version. 
 
 If you have installed any of these previously please make sure you have the most up-to-date versions. 
 
@@ -26,12 +24,19 @@ If you have installed any of these previously please make sure you have the most
 
 Now install the following packages by going into Rstudio (or R) by typing:
 ```{r,eval=FALSE}
-install.packages(c('rjags','R2jags','rmutil','boot','rstan','rstanarm','lme4'))
+install.packages(c('rmutil','boot','lme4'))
 ```
 
-Note: this might take a while as these are pretty big and complicated packages.
+### Step 3
 
-Once you have installed these I would recommend checking the [rstan installation guide](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started) to check everything is working
+Visit the [rstan installation guide](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started) to install `rstan`
+
+### Step 4
+
+Install `stanarm` via:
+```{r,eval=FALSE}
+install.packages('rstanarm')
+```
 
 ### Troubleshooting
 
