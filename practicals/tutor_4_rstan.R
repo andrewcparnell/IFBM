@@ -36,8 +36,6 @@ model {
 
 ## run on the earnings data
 earnings = read.csv('../data/earnings.csv')
-library(rstan)
-#options(mc.cores = parallel::detectCores())
 stan_run = stan(data = list(N = nrow(earnings), 
                             y = earnings$y,
                             x = earnings$x_centered),
@@ -192,6 +190,14 @@ generated quantities {
 }
 '
 
+stan_run_4 = stan(data = list(N = nrow(earnings), 
+                              y = earnings$y,
+                              x = earnings$x_centered),
+                  model_code = stan_code_4)
+y_pred = extract(stan_run_4, 'y_pred')$y_pred
+pp_check(earnings$y, y_pred, ppc_scatter_avg)
+
+
 ## Over-dispered Poisson
 stan_code_od_pois = '
 data {
@@ -235,6 +241,68 @@ prostate = read.csv('../data/prostate.csv')
 waic_1 = waic(mod_1)
 waic_2 = waic(mod_2)
 compare_models(waic_1, waic_2)
+
+# Binomial logistic regression
+stan_code_bin = '
+data {
+  int<lower=0> N;
+  vector[N] x;
+  int y[N];
+}
+parameters {
+  real alpha;
+  real beta;
+} 
+model {
+  y ~ binomial_logit(1, alpha + beta * x);
+  alpha ~ normal(0, 10);
+  beta ~ normal(0, 10);
+}
+generated quantities {
+  vector[N] y_rep;
+  vector[N] p_fit;
+  for (i in 1:N) {
+    p_fit[i] = inv_logit(alpha + beta * x[i]);
+    y_rep[i] = binomial_rng(1, p_fit[i]);
+  }
+}
+'
+swt = read.csv('https://raw.githubusercontent.com/andrewcparnell/ifbm/master/data/swt.csv')
+stan_run_bin = stan(data = list(N = nrow(swt), 
+                            y = swt$rep.1,
+                            x = swt$forest - mean(swt$forest)),
+                model_code = stan_code_bin)
+plot(stan_run_bin)
+y_rep = extract(stan_run_bin, 'y_rep')$y_rep
+p_fit = extract(stan_run_bin, 'p_fit')$p_fit
+p_fit_mean = apply(p_fit, 2, 'mean')
+
+# For binary models use ROC curve to judge fit
+# Use the ROCR package
+library(ROCR)
+
+# Give it the fitted probabilities and the true binary labels
+pred = prediction(p_fit_mean, swt$rep.1)
+# Create true positive rate and falst positive rate
+perf = performance(pred,"tpr","fpr")
+# Optionally calculate AUC
+performance(pred,"auc")@y.values[[1]] # 0.6959614
+# Plot ROC curve
+plot(perf)
+
+# Can we do the same in rstanarm
+library(rstanarm)
+stan_arm_bin = stan_glm(rep.1 ~ forest, 
+                          data = swt, 
+                          family = binomial)
+p_fit_mean = fitted(stan_arm_bin)
+pred = prediction(p_fit_mean, swt$rep.1)
+# Create true positive rate and falst positive rate
+perf = performance(pred,"tpr","fpr")
+# Optionally calculate AUC
+performance(pred,"auc")@y.values[[1]] # 0.6959614
+# Plot ROC curve
+plot(perf)
 
 # Class 11 ----------------------------------------------------------------
 
@@ -480,10 +548,16 @@ stan_run_5 = stan(data = list(N = nrow(earnings),
                               age = earnings$age,
                               N_eth = length(unique(earnings$eth)),
                               N_age = length(unique(earnings$age))),
-                  model_code = stan_code_5)
+                  model_code = stan_code_5,
+                  control = list(adapt_delta = 0.9))
 
 ## Plot and summarise
-plot(stan_run_5)
+plot(stan_run_5, pars = c('intercept', 'mean_intercept'))
+plot(stan_run_5, pars = c('slope', 'mean_slope'))
+plot(stan_run_5, pars = c('residual_sd',
+                          'sigma_intercept',
+                          'sigma_slope'))
+
 stan_run_5_summ = summary(stan_run_5)
 round(stan_run_5_summ$summary, 2)
 
@@ -619,7 +693,7 @@ parameters {
 }
 model {
   for (i in 1:N) 
-  y[i] ~ poisson_log(beta_trt[trt[i]]);
+    y[i] ~ poisson_log(beta_trt[trt[i]]);
   
   // Priors on coefficients
   for(j in 1:N_trt)
