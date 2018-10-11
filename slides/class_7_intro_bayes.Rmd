@@ -76,7 +76,7 @@ $$p(\theta|x) = \frac{p(x|\theta) \times p(\theta)}{p(x)}$$
 
 Suppose you had some data that looked like this:
 ```{r, echo=FALSE}
-dat = read.csv('../data/earnings.csv')
+dat = read.csv('data/earnings.csv')
 with(dat, plot(x_centered, y))
 ```
 
@@ -92,10 +92,12 @@ summary(mod_lm)
 ## What you will now get instead
 
 \tiny
-```{r, message=FALSE}
+```{r, message=FALSE, results = 'hide'}
 library(rstanarm)
 mod_stan = stan_lm(y ~ x_centered, data = dat,
                prior = R2(location = 0.5, 'mean'))
+```
+```{r}
 mod_stan
 ```
 
@@ -120,9 +122,11 @@ posterior_interval(mod_stan)
 
 ## With prior information
 
-```{r, message=FALSE}
+```{r, message=FALSE, results = 'hide'}
 mod_stan_2 = stan_lm(y ~ x_centered, data = dat,
                prior = R2(location = 0.01, 'mean'))
+```
+```{r}
 posterior_interval(mod_stan_2)
 ```
 
@@ -172,12 +176,12 @@ Almost always, the likelihood and prior can be picked from the standard probabil
 \tiny
 \begin{tabular}{p{3cm}lp{4cm}}
 \hline
-Distribution & Range of parameter & Useful for \\
+Distribution & Range of data & Useful for \\
 \hline
 Normal, $N(\mu,\sigma^2)$ & $(-\infty,\infty$) & A good default choice \\
 Uniform, $U(a,b)$ & $(a,b)$ & Vague priors when we only know the range of the parameter \\
-Binomial, $Bin(k,\theta)$ & $[0,k]$ & Count or binary data restricted to have an upper value \\
-Poisson, $Po(\lambda)$ & $[0,\infty)$ & Count data with no upper limit \\
+Beta, $Be(\alpha,\beta)$ & $[0,1]$ & Probabilities restriced to be between 0 and 1 \\
+t, $t(\mu, \sigma)$ & $(-\infty,\infty$) & Potentially long-tailed or data containing outliers \\
 Gamma, $Ga(\alpha,\beta)$ & $(0,\infty)$ & Continuous data with a lower bound of zero \\
 Multivariate Normal, $MVN(\mu,\Sigma)$ & $(-\infty,\infty$) & Multivariate unbounded data with correlation between parameters/observations \\
 \hline

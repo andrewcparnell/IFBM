@@ -123,7 +123,7 @@ y = rbinom(N, size = 1, prob = p)
 
 ## Example: earnings data
 
-- Going back to the earnings data, suppose we want to fit a model to predict log earnings based on sex and whether respondent is white (`eth==3`) or not
+- Going back to the earnings data, suppose we want to fit a model to predict log earnings based on height and whether respondent is white (`eth==3`) or not
 - The model is:
 $$\log(\mbox{earnings}) \sim N(\alpha + \beta_1 \mbox{height} + \beta_2 \mbox{white}, \sigma^2)$$
 - We want to get the posterior distribution of $\alpha, \beta_1, \beta_2$ and $\sigma$ given the data
@@ -229,7 +229,7 @@ plot(stan_run)
 
 ## What is stan doing in the background?
 
-- Stans run a stochastic algorithm called Hamiltonian Monte Carlo to create the samples from the posterior distribution
+- Stans run a stochastic algorithm called Hamiltonian Monte Carlo (HMC; a version of _Markov chain Monte Carlo_, MCMC) to create the samples from the posterior distribution
 - This involves:
 
     1. Guessing at _initial values_ of the parameters. Scoring these against the likelihood and the prior to see how well they match the data
@@ -288,7 +288,7 @@ mcmc_hist(post)
 ## Checking model fit
 
 - How do we know if this model fits the data well or not?
-- One way is to simulate from the posterior distribution of the parameters, and subsequently simulate from the likelihood to see if the these data match the real data we observed
+- One way is to simulate from the posterior distribution of the parameters, and subsequently simulate from the likelihood to see if these data match the real data we observed
 - This is known as a _posterior predictive check_ 
 
 ## Posterior predictive: the long way
@@ -405,21 +405,21 @@ points(swt$forest,
 pp_check(mod_3)
 ```
 
-## Binomial modelling as latent data
+<!-- ## Binomial modelling as latent data -->
 
-- The most common way of using binomial or binary data is using the logit link function
-- An alternative way of fitting binomial data is via a cut-off normal distribution:
-$$y_i = \left\{ \begin{array}{ll} 1 & \mbox{if}\; z_i \ge0 \\ 0 & \mbox{if}\; z_i<0 \end{array} \right.$$
-with
-$$z_i \sim N(\alpha + \beta x_i, 1)$$
-- This is known as probit regression, with $z_i$ a _latent parameter_
+<!-- - The most common way of using binomial or binary data is using the logit link function -->
+<!-- - An alternative way of fitting binomial data is via a cut-off normal distribution: -->
+<!-- $$y_i = \left\{ \begin{array}{ll} 1 & \mbox{if}\; z_i \ge0 \\ 0 & \mbox{if}\; z_i<0 \end{array} \right.$$ -->
+<!-- with -->
+<!-- $$z_i \sim N(\alpha + \beta x_i, 1)$$ -->
+<!-- - This is known as probit regression, with $z_i$ a _latent parameter_ -->
 
 ## Poisson models
 
 - Here's some `rstanarm` code for a Poisson model:
 ```{r, eval = FALSE}
-mod_4 = stan_glm(rep.1 ~ forest, 
-                 data = swt,
+mod_4 = stan_glm(satell ~ width, 
+                 data = horseshoe,
                  family = poisson(link = 'log'),
                  prior = normal(0, 1),
                  prior_intercept = normal(0, 5))

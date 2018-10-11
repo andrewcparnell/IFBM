@@ -143,7 +143,7 @@ model {
 - The declarations are a minefield. There seems to be at least 2 ways to specify vectors, and multiple ways to specify matrices. Hopefully they will tidy up in a future version
 - However you can declare other variables on the fly in e.g. the `model` or `transformed parameters` sections
 - Within block it doesn't seem to matter hugely the order the code is in, but the declarations need to be at the top
-- Unlike most or R, everything is strongly typed. You cannot miss anything out of the `parameters` or `data` parts
+- Unlike most of R, everything is strongly typed. You cannot miss anything out of the `parameters` or `data` parts
 - If you can vectorise the likelihood stan will run much faster
 
 ## Mixed effects models in rstan

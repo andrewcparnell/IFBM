@@ -238,7 +238,7 @@ involving the covariate
 \end{Shaded}
 
 \begin{verbatim}
-##  [1] 0 1 1 1 0 0 1 0 0 1
+##  [1] 0 0 0 1 1 1 1 1 1 1
 \end{verbatim}
 
 \begin{itemize}
@@ -272,7 +272,7 @@ involving the covariate
 \end{Shaded}
 
 \begin{verbatim}
-##  [1] 0 0 1 1 0 2 2 3 8 2
+##  [1] 0 2 0 0 0 1 5 2 8 5
 \end{verbatim}
 
 \begin{itemize}
@@ -379,7 +379,7 @@ involving the covariate
 \tightlist
 \item
   Going back to the earnings data, suppose we want to fit a model to
-  predict log earnings based on sex and whether respondent is white
+  predict log earnings based on height and whether respondent is white
   (\texttt{eth==3}) or not
 \item
   The model is:
@@ -414,23 +414,23 @@ Model code: \tiny
 
 \begin{verbatim}
 ##                   mean mcse   sd     2.5%      25%      50%      75%
-## (Intercept)       9.65 0.00 0.07     9.52     9.61     9.65     9.70
+## (Intercept)       9.65 0.00 0.06     9.53     9.61     9.65     9.70
 ## x_centered        0.02 0.00 0.00     0.02     0.02     0.02     0.02
-## white             0.10 0.00 0.07    -0.04     0.06     0.10     0.15
-## sigma             0.91 0.00 0.02     0.87     0.89     0.91     0.92
-## log-fit_ratio     0.00 0.00 0.02    -0.04    -0.01     0.00     0.02
+## white             0.10 0.00 0.07    -0.04     0.05     0.10     0.15
+## sigma             0.91 0.00 0.02     0.87     0.89     0.90     0.92
+## log-fit_ratio     0.00 0.00 0.02    -0.04    -0.01     0.00     0.01
 ## R2                0.06 0.00 0.01     0.03     0.05     0.06     0.07
 ## mean_PPD          9.74 0.00 0.04     9.66     9.71     9.74     9.76
-## log-posterior -1402.70 0.06 1.82 -1407.13 -1403.66 -1402.36 -1401.36
+## log-posterior -1402.65 0.07 1.78 -1407.05 -1403.59 -1402.31 -1401.36
 ##                  97.5% n_eff Rhat
-## (Intercept)       9.78  1785    1
-## x_centered        0.03  2479    1
-## white             0.25  1792    1
-## sigma             0.95  2620    1
-## log-fit_ratio     0.05  2422    1
-## R2                0.09  2548    1
-## mean_PPD          9.81  4000    1
-## log-posterior -1400.21  1038    1
+## (Intercept)       9.78  1472 1.00
+## x_centered        0.03  1901 1.00
+## white             0.24  1500 1.00
+## sigma             0.95  2171 1.00
+## log-fit_ratio     0.04  2172 1.00
+## R2                0.09  1993 1.00
+## mean_PPD          9.82  4000 1.00
+## log-posterior -1400.18   715 1.01
 \end{verbatim}
 
 \end{frame}
@@ -467,23 +467,23 @@ Model code: \tiny
 
 \begin{verbatim}
 ##                   mean mcse   sd     2.5%      25%      50%      75%
-## (Intercept)       9.65 0.00 0.07     9.52     9.61     9.65     9.70
+## (Intercept)       9.65 0.00 0.07     9.53     9.61     9.65     9.70
 ## x_centered        0.02 0.00 0.00     0.02     0.02     0.02     0.02
 ## white             0.10 0.00 0.07    -0.04     0.05     0.10     0.15
 ## sigma             0.91 0.00 0.02     0.87     0.89     0.91     0.92
 ## log-fit_ratio     0.00 0.00 0.02    -0.04    -0.01     0.00     0.02
 ## R2                0.06 0.00 0.01     0.03     0.05     0.06     0.07
 ## mean_PPD          9.74 0.00 0.04     9.66     9.71     9.74     9.76
-## log-posterior -1404.11 0.06 1.75 -1408.59 -1405.05 -1403.79 -1402.80
+## log-posterior -1404.07 0.06 1.75 -1408.38 -1404.95 -1403.76 -1402.79
 ##                  97.5% n_eff Rhat
-## (Intercept)       9.78  1446    1
-## x_centered        0.03  1880    1
-## white             0.25  1605    1
-## sigma             0.95  2443    1
-## log-fit_ratio     0.04  2333    1
-## R2                0.09  1974    1
-## mean_PPD          9.81  4000    1
-## log-posterior -1401.70  1014    1
+## (Intercept)       9.79  1835    1
+## x_centered        0.03  1973    1
+## white             0.24  1883    1
+## sigma             0.95  2667    1
+## log-fit_ratio     0.04  2573    1
+## R2                0.09  2044    1
+## mean_PPD          9.82  4000    1
+## log-posterior -1401.69   951    1
 \end{verbatim}
 
 \end{frame}
@@ -504,13 +504,13 @@ Model code: \tiny
 \end{Shaded}
 
 \begin{verbatim}
-##   (Intercept) x_centered      white     sigma log-fit_ratio         R2
-## 1    9.592836 0.02507382 0.21633742 0.9301058  0.0360975405 0.07399261
-## 2    9.551875 0.02282112 0.17018098 0.9139646  0.0123258219 0.06231639
-## 3    9.588871 0.02163994 0.15578411 0.8900420 -0.0160066247 0.05891715
-## 4    9.589588 0.02174304 0.20310271 0.9158380  0.0128601927 0.05947395
-## 5    9.599199 0.02180863 0.19532988 0.9138107  0.0106283403 0.05944437
-## 6    9.680555 0.01996215 0.04551595 0.9121066  0.0007152551 0.04418558
+##   (Intercept) x_centered       white     sigma log-fit_ratio         R2
+## 1    9.773005 0.02323879 0.007033384 0.9048170  0.0003963315 0.05880207
+## 2    9.700179 0.02448560 0.086141421 0.8773434 -0.0238810047 0.07106429
+## 3    9.695990 0.02497925 0.068183801 0.8744902 -0.0258818269 0.07339593
+## 4    9.743009 0.02654833 0.015151170 0.8657575 -0.0312978546 0.08191868
+## 5    9.591211 0.01567982 0.139835621 0.9343962  0.0176310187 0.03026801
+## 6    9.628174 0.01740307 0.092638902 0.9266600  0.0115356900 0.03456116
 \end{verbatim}
 
 \end{frame}
@@ -608,8 +608,9 @@ Model code: \tiny
 
 \begin{itemize}
 \item
-  Stans run a stochastic algorithm called Hamiltonian Monte Carlo to
-  create the samples from the posterior distribution
+  Stans run a stochastic algorithm called Hamiltonian Monte Carlo (HMC;
+  a version of \emph{Markov chain Monte Carlo}, MCMC) to create the
+  samples from the posterior distribution
 \item
   This involves:
 
@@ -769,7 +770,7 @@ has a stationary mean and variance
 \item
   One way is to simulate from the posterior distribution of the
   parameters, and subsequently simulate from the likelihood to see if
-  the these data match the real data we observed
+  these data match the real data we observed
 \item
   This is known as a \emph{posterior predictive check}
 \end{itemize}
@@ -913,15 +914,15 @@ Recall the Willow tit data: \tiny
 
 \begin{verbatim}
 ##                  mean mcse   sd    2.5%     25%     50%     75%   97.5%
-## (Intercept)     -1.85 0.01 0.28   -2.41   -2.03   -1.85   -1.66   -1.33
+## (Intercept)     -1.84 0.01 0.26   -2.38   -2.02   -1.84   -1.66   -1.35
 ## forest           0.02 0.00 0.01    0.01    0.02    0.02    0.03    0.03
-## mean_PPD         0.28 0.00 0.04    0.21    0.26    0.28    0.31    0.37
-## log-posterior -135.87 0.02 1.01 -138.55 -136.31 -135.56 -135.14 -134.86
+## mean_PPD         0.28 0.00 0.04    0.21    0.26    0.28    0.31    0.36
+## log-posterior -135.80 0.02 0.96 -138.29 -136.18 -135.50 -135.12 -134.86
 ##               n_eff Rhat
-## (Intercept)    2120    1
-## forest         2395    1
-## mean_PPD       3217    1
-## log-posterior  1752    1
+## (Intercept)    2385    1
+## forest         2390    1
+## mean_PPD       3061    1
+## log-posterior  1864    1
 \end{verbatim}
 
 \end{frame}
@@ -980,25 +981,6 @@ Recall the Willow tit data: \tiny
 
 \end{frame}
 
-\begin{frame}{Binomial modelling as latent data}
-
-\begin{itemize}
-\tightlist
-\item
-  The most common way of using binomial or binary data is using the
-  logit link function
-\item
-  An alternative way of fitting binomial data is via a cut-off normal
-  distribution:
-  \[y_i = \left\{ \begin{array}{ll} 1 & \mbox{if}\; z_i \ge0 \\ 0 & \mbox{if}\; z_i<0 \end{array} \right.\]
-  with \[z_i \sim N(\alpha + \beta x_i, 1)\]
-\item
-  This is known as probit regression, with \(z_i\) a \emph{latent
-  parameter}
-\end{itemize}
-
-\end{frame}
-
 \begin{frame}[fragile]{Poisson models}
 
 \begin{itemize}
@@ -1009,8 +991,8 @@ Recall the Willow tit data: \tiny
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{mod_}\DecValTok{4}\NormalTok{ =}\StringTok{ }\KeywordTok{stan_glm}\NormalTok{(rep.}\DecValTok{1} \OperatorTok{~}\StringTok{ }\NormalTok{forest, }
-                 \DataTypeTok{data =}\NormalTok{ swt,}
+\NormalTok{mod_}\DecValTok{4}\NormalTok{ =}\StringTok{ }\KeywordTok{stan_glm}\NormalTok{(satell }\OperatorTok{~}\StringTok{ }\NormalTok{width, }
+                 \DataTypeTok{data =}\NormalTok{ horseshoe,}
                  \DataTypeTok{family =} \KeywordTok{poisson}\NormalTok{(}\DataTypeTok{link =} \StringTok{'log'}\NormalTok{),}
                  \DataTypeTok{prior =} \KeywordTok{normal}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{),}
                  \DataTypeTok{prior_intercept =} \KeywordTok{normal}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{))}

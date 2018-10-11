@@ -57,9 +57,8 @@ library(rstanarm)
 mod_1 = stan_lm(lpsa ~ lcavol, data = prostate,
                 prior = R2(location = 0.5, 'mean'))
 summary(mod_1)
-mod_2 = stan_lm(lpsa ~ lcavol:as.factor(gleason), data = prostate,
+mod_2 = stan_lm(lpsa ~ lcavol + lcavol:as.factor(gleason), data = prostate,
                 prior = R2(location = 0.5, 'mean'))
-summary(mod_2)
 # 3
 mod_3 = stan_lmer(lpsa ~ lcavol+ ( 1| gleason), data = prostate)
 summary(mod_3)

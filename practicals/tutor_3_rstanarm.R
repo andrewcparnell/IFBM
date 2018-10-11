@@ -1,16 +1,16 @@
 # Taken from classes 7, 8 and 9
 
-# Boilder plate code
+# Boiler plate code
 par(mar=c(3,3,2,1), mgp=c(2,.7,0), tck=-.01,las=1)
 library(rstanarm)
 #options(mc.cores = parallel::detectCores())
 library(boot)
 library(bayesplot)
 library(rstan)
-
+rstan_options(auto_write = TRUE)
 
 ## Load in data
-dat = read.csv('../data/earnings.csv')
+dat = read.csv('data/earnings.csv')
 with(dat, plot(x_centered, y))
 
 ## Fixed effects model
@@ -90,7 +90,7 @@ y = rpois(N, lambda)
 y
 
 ## Earnings model
-earnings = read.csv('../data/earnings.csv')
+earnings = read.csv('data/earnings.csv')
 earnings$white = as.integer(earnings$eth == 3)
 mod_1 = stan_lm(y ~ x_centered + white, data = earnings,
                 prior = R2(location = 0.5, 'mean'))
@@ -121,19 +121,19 @@ mcmc_areas(post,
 ## rstan code
 stan_code = '
 data {
-int<lower=0> N;
-vector[N] y;
-vector[N] x1;
-vector[N] x2;
+  int<lower=0> N;
+  vector[N] y;
+  vector[N] x1;
+  vector[N] x2;
 }
 parameters {
-real alpha;
-real beta1;
-real beta2;
-real<lower=0> sigma;
+  real alpha;
+  real beta1;
+  real beta2;
+  real<lower=0> sigma;
 }
 model {
-y ~ normal(alpha + x1 * beta1  + x2 * beta2, sigma);
+  y ~ normal(alpha + x1 * beta1  + x2 * beta2, sigma);
 }
 '
 

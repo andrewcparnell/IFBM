@@ -151,8 +151,8 @@
   Within this framework, we can borrow the ideas from the previous class
   to create hierarchical GLMs
 \item
-  We will go through four examples: binomial-logit, Poisson, robust
-  regression, and ordinal regression
+  We will go through four examples: binomial-logit, Poisson, and ordinal
+  regression
 \end{itemize}
 
 \end{frame}
@@ -183,17 +183,17 @@
 
 \begin{verbatim}
 ##                                        5%   95%
-## (Intercept)                         9.636 9.782
-## x_centered                         -0.009 0.031
-## b[(Intercept) eth:1]               -0.081 0.040
-## b[x_centered eth:1]                -0.025 0.016
-## b[(Intercept) eth:2]               -0.105 0.040
-## b[x_centered eth:2]                -0.022 0.022
-## b[(Intercept) eth:3]               -0.025 0.107
-## b[x_centered eth:3]                -0.005 0.035
-## b[(Intercept) eth:4]               -0.068 0.075
-## b[x_centered eth:4]                -0.033 0.017
-## sigma                               0.873 0.938
+## (Intercept)                         9.636 9.784
+## x_centered                         -0.006 0.031
+## b[(Intercept) eth:1]               -0.083 0.043
+## b[x_centered eth:1]                -0.026 0.014
+## b[(Intercept) eth:2]               -0.097 0.035
+## b[x_centered eth:2]                -0.022 0.019
+## b[(Intercept) eth:3]               -0.024 0.109
+## b[x_centered eth:3]                -0.006 0.032
+## b[(Intercept) eth:4]               -0.070 0.076
+## b[x_centered eth:4]                -0.034 0.016
+## sigma                               0.872 0.938
 ## Sigma[eth:(Intercept),(Intercept)]  0.000 0.016
 ## Sigma[eth:x_centered,(Intercept)]  -0.001 0.002
 ## Sigma[eth:x_centered,x_centered]    0.000 0.002
@@ -312,17 +312,17 @@ where \(x_i\) is the percentage of forest cover
 
 \begin{verbatim}
 ##                                               5%          95%
-## (Intercept)                        -2.9716628359 -1.410061400
-## forest                             -0.0053591880  0.006660342
-## b[(Intercept) alt:High]            -0.1546953851  1.393642353
-## b[forest alt:High]                  0.0132429998  0.033927229
-## b[(Intercept) alt:Low]             -1.8313389184  0.011825971
-## b[forest alt:Low]                  -0.0278474865  0.015678492
-## b[(Intercept) alt:Med]             -0.4328987953  1.192305997
-## b[forest alt:Med]                   0.0024746665  0.024134954
-## Sigma[alt:(Intercept),(Intercept)]  0.0033074897  2.987954932
-## Sigma[alt:forest,(Intercept)]      -0.0316645266  0.056452610
-## Sigma[alt:forest,forest]            0.0001374629  0.025760649
+## (Intercept)                        -3.0547350656 -1.500090318
+## forest                             -0.0053117955  0.006815317
+## b[(Intercept) alt:High]            -0.1039793407  1.497335796
+## b[forest alt:High]                  0.0131837840  0.033605020
+## b[(Intercept) alt:Low]             -1.7271176612  0.020935355
+## b[forest alt:Low]                  -0.0292270906  0.015086361
+## b[(Intercept) alt:Med]             -0.3306274126  1.242020299
+## b[forest alt:Med]                   0.0029792495  0.024435972
+## Sigma[alt:(Intercept),(Intercept)]  0.0019747303  2.579853972
+## Sigma[alt:forest,(Intercept)]      -0.0317051285  0.046441427
+## Sigma[alt:forest,forest]            0.0001418906  0.025561489
 \end{verbatim}
 
 \end{frame}
@@ -339,13 +339,27 @@ where \(x_i\) is the percentage of forest cover
 
 \end{frame}
 
-\begin{frame}{Model fit - intercepts}
+\begin{frame}[fragile]{Model fit - intercepts}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{mcmc_hist}\NormalTok{(}\KeywordTok{as.data.frame}\NormalTok{(mod_}\DecValTok{2}\NormalTok{), }
+          \DataTypeTok{regex_pars =} \StringTok{'b}\CharTok{\textbackslash{}\textbackslash{}}\StringTok{[}\CharTok{\textbackslash{}\textbackslash{}}\StringTok{(Intercept'}\NormalTok{,}
+          \DataTypeTok{facet_args =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{nrow =} \DecValTok{3}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
 
 \includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-9-1.pdf}
 
 \end{frame}
 
-\begin{frame}{Model fit - Slopes}
+\begin{frame}[fragile]{Model fit - Slopes}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{mcmc_hist}\NormalTok{(}\KeywordTok{as.data.frame}\NormalTok{(mod_}\DecValTok{2}\NormalTok{), }\DataTypeTok{regex_pars =} \StringTok{'b}\CharTok{\textbackslash{}\textbackslash{}}\StringTok{[forest'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-10-1.pdf}
 
@@ -366,7 +380,13 @@ where \(x_i\) is the percentage of forest cover
 
 \end{frame}
 
-\begin{frame}{Model fit - posterior predictive check 2}
+\begin{frame}[fragile]{Model fit - posterior predictive check 2}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{pp_check}\NormalTok{(mod_}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \includegraphics{class_9_bhglms_files/figure-beamer/unnamed-chunk-12-1.pdf}
 
@@ -407,8 +427,7 @@ where \(x_i\) is the percentage of forest cover
   We now need to estimate prior distributions for \(\alpha\), \(\beta\),
   and \(\sigma\)
 \item
-  We will use the SWT data again, but pretend that we didn't know that
-  they had gone out \(N\) times looking for the birds
+  We will use the horseshoe data again (see yesterday)
 \end{itemize}
 
 \end{frame}
@@ -417,10 +436,11 @@ where \(x_i\) is the percentage of forest cover
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{swt}\OperatorTok{$}\NormalTok{obs <-}\StringTok{ }\DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(swt)}
-\NormalTok{mod_}\DecValTok{3}\NormalTok{ =}\StringTok{ }\KeywordTok{stan_glmer}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{forest }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1} \OperatorTok{|}\StringTok{ }\NormalTok{obs),}
-              \DataTypeTok{family =}\NormalTok{ poisson, }\DataTypeTok{data =}\NormalTok{ swt)}
-\KeywordTok{mcmc_hist}\NormalTok{(}\KeywordTok{as.data.frame}\NormalTok{(mod_}\DecValTok{3}\NormalTok{), }\DataTypeTok{regex_pars =} \StringTok{'forest'}\NormalTok{)}
+\NormalTok{horseshoe =}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'data/horseshoe.csv'}\NormalTok{)}
+\NormalTok{horseshoe}\OperatorTok{$}\NormalTok{obs <-}\StringTok{ }\DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(horseshoe)}
+\NormalTok{mod_}\DecValTok{3}\NormalTok{ =}\StringTok{ }\KeywordTok{stan_glmer}\NormalTok{(satell }\OperatorTok{~}\StringTok{ }\NormalTok{weight }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1} \OperatorTok{|}\StringTok{ }\NormalTok{obs),}
+              \DataTypeTok{family =}\NormalTok{ poisson, }\DataTypeTok{data =}\NormalTok{ horseshoe)}
+\KeywordTok{mcmc_hist}\NormalTok{(}\KeywordTok{as.data.frame}\NormalTok{(mod_}\DecValTok{3}\NormalTok{), }\DataTypeTok{regex_pars =} \StringTok{'Sigma'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -440,22 +460,18 @@ where \(x_i\) is the percentage of forest cover
 
 \end{frame}
 
-\begin{frame}[fragile]{Notes about OD Poisson model}
+\begin{frame}{Notes about OD Poisson model}
 
 \begin{itemize}
 \item
   The way to think about OD models is via the data generating process.
-  Draw a DAG and think about how these processes might arise
+  You could draw a DAG and think about how these processes might arise
 \item
   We could compare this model to one without over dispersion via the PPC
-  (or if time, cross validation).
+  (or if time, WAIC, LOO, or cross validation).
 \item
   In general, the parameter values (i.e.~the intercepts and slopes) tend
   to be more uncertain when you add in over dispersion
-\item
-  Also in the data set is a variable called \texttt{dur} which
-  represents how long they spent looking for the birds. This could be
-  added in as an offset via the likelihood
 \end{itemize}
 
 \end{frame}
