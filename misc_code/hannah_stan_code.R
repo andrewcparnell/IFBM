@@ -46,10 +46,11 @@ library(rstan)
 
 
 # Create data list
-my_data = list(Ref_EMG = ...
-               TL = ....,
-               N = nrow( ... ),
-               replicate = ...)
+my_data = list(y = ...
+               x = ...,
+               N = ...,
+               N_class = ...,
+               class = ...)
 
 # Run Stan
 stan_run = stan(data = my_data,
