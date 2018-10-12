@@ -5,10 +5,12 @@ data {
   vector[N] TL; // Covariate
   int N_replicate; // Number of replicates
   int replicate[N]; // replicate index
+  int N_replicate; // Number of replicates
+  int replicate[N]; // replicate index
 }
 parameters {
   vector[N_replicate] alpha; // Intercept by replicate
-  real beta // Slope associated with TL
+  real beta; // Slope associated with TL
   real mu_alpha; // Mean intercept
   real<lower = 0> sigma_alpha; // Variability between intercepts
 }
