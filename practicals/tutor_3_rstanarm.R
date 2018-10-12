@@ -10,7 +10,7 @@ library(rstan)
 rstan_options(auto_write = TRUE)
 
 ## Load in data
-dat = read.csv('data/earnings.csv')
+dat = read.csv('../data/earnings.csv')
 with(dat, plot(x_centered, y))
 
 ## Fixed effects model
